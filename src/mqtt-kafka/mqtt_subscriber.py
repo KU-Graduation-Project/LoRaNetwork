@@ -1,9 +1,9 @@
 import paho.mqtt.client as mqtt
 import time
 
-mqtt_broker = 'mqtt.pycharmprojects.io'
+mqtt_broker_address = '127.0.0.1'
 mqtt_client = mqtt.Client('MQTTConsumer')
-mqtt_client.connect(mqtt_broker)
+mqtt_client.connect(mqtt_broker_address)
 
 
 def on_message(client, userdata, message):
@@ -12,7 +12,7 @@ def on_message(client, userdata, message):
 
 
 mqtt_client.loop_start()
-mqtt_client.subscribe('temperature3') #토픽 지정
+mqtt_client.subscribe('new-topic') #토픽 지정
 mqtt_client.on_message = on_message
 time.sleep(300)
 mqtt_client.loop_stop()
