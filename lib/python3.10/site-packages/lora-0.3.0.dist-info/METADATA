@@ -1,0 +1,20 @@
+Metadata-Version: 2.0
+Name: lora
+Version: 0.3.0
+Summary: Package for interacting with Lorenz REST API
+Home-page: https://github.com/llnl/python-lora
+Author: Ian Lee
+Author-email: lee1001@llnl.gov
+License: UNKNOWN
+Platform: UNKNOWN
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 3
+Requires-Dist: requests
+
+UNKNOWN
+
+
