@@ -1,52 +1,59 @@
-import socket
-import argparse
+import random
+import struct
 import threading
 import time
+from drawGraph import drawGraph
+from lora import lora
+from queue import Queue
 
-host = "127.0.0.1"
-port = 4000
-
-def handle_client(client_socket, addr):
-    print("접속한 클라이언트의 주소 : ", addr)
-    user = client_socket.recv(1024)
-    string = "%s 님과 소켓 통신 성공"%user.decode()
-    client_socket.sendall(string.encode())
-    print("1초 후 클라이언트 종료")
-    time.sleep(1)
-    client_socket.close()
-
-def accept_func():
-    global server_socket
-    #IPv4 체계 (통신 모뎀 따라 IPv6로 변환 필요할 수도 있음)
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    #포트의 범위 :  1-65535
-    server_socket.bind((host, port))
-
-    #최대 5개 스레드
-    server_socket.listen(5)
-
-    while 1:
-        try:
-            client_socket, addr = server_socket.accept()
-        except KeyboardInterrupt:
-            server_socket.close()
-            print("Keyboard interrupt")
-
-        print("클라이언트 핸들러 스레드로 이동 됩니다.")
-        #accept()함수로 입력만 받아주고 이후 알고리즘은 핸들러에게 넘김
-        t = threading.Thread(target=handle_client, args=(client_socket, addr))
-        t.daemon = True
-        t.start()
+#send_example
+def make_data_ex(time, datalist):
+    threading.Timer(time,make_data_ex,[1, datalist]).start()
+    x = [random.randint(0,10).to_bytes(4, 'big'), random.randint(10, 20).to_bytes(4, 'big')]
+    datalist.put(x)
+    print("make_data", x)
+    return
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="\nServer\n-p port\n")
-    parser.add_argument('-p', help="port")
+def print_queue(period, queue):
+    threading.Timer(period, print_queue, [period, queue]).start()
 
-    args = parser.parse_args()
-    try:
-        port = int(args.p)
-    except:
-        pass
-    accept_func()
+    if queue.empty() == False:
+        queue.task_done()
+        print(queue.get())
+
+
+
+#save data 데이터 저장하기
+#데이터 type별로 따로 저장하는 방법 생각하기
+#type 별로 ㅣlist에 저장하면 된다.
+def change_datatype(data, type) :
+    match type:
+        case 'int':
+            return int.from_bytes(data, "big")
+        case 'float':
+            return struct.unpack('f', data)
+        case 'char':
+            return data.decode("utf-8")
+
+    return
+
+
+
+graph1 = drawGraph()
+graph_queue1 = Queue()
+graph_queue2 = Queue()
+graph_queue3 = Queue()
+graph_queuelist = [graph_queue1, graph_queue2, graph_queue3]
+
+datatype = ['int', 'float', 'char']
+save_data1 = [0,10,20,30,40,50,60,70,80,9,90,95]
+save_data2 = []
+save_data3 = []
+save_datalist = [save_data1, save_data2, save_data3]
+
+lora_ex = lora("loe")
+
+graph1.drawgraph(graph_queuelist[0], 0, 2, 10, 0, 50)
+
+exit()
