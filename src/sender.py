@@ -53,11 +53,8 @@ while True :
 
 receiving_thread = threading.Thread(target=receive_data, args=(serial_port, arr))
 # receiving_thread = threading.Thread(target=draw_graph, args=(5,))
-print("??")
 receiving_thread.start()
 threading.Timer(1, receive_data, [serial_port, arr])
 
 while True :
-    print(arr)
-    print("?")
     time.sleep(5)
