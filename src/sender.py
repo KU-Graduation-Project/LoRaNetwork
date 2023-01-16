@@ -19,22 +19,25 @@ def make_port(port_name, rate, byte_size):
     )
 
     ser.isOpen()
+    print('port open')
 
     return ser
 
-def send_data(datalist, serial_port) :
-    if serial_port.isOpen() :
+def send_data(datalist, receive_port) :
+    if receive_port.isOpen() :
         for data in datalist :
-            serial_port.write(data)
+            receive_port.write(data)
+            print(data)
 
 #draw graph main 참고 하여 import 후 작성
 def draw_graph(a) :
-    print("graph"+a)
+    print("graph: "+a)
     return
 
 
-## Running part
+## Running port
 serial_port = make_port('COM4', 9600, 8)
+receive_port = make_port('COM3', 9600, 8)
 
 #Make Data
 
@@ -47,14 +50,11 @@ while True :
     by = struct.pack('f', y)
     bc = bytes(c, 'utf-8')
     data = [bi, by, bc]
-    send_data(data, serial_port)
+    send_data(data, receive_port)
+    time.sleep(3)
 
 
-
-receiving_thread = threading.Thread(target=receive_data, args=(serial_port, arr))
-# receiving_thread = threading.Thread(target=draw_graph, args=(5,))
+#receiving_thread = threading.Thread(target=receive_data, args=(receive_port, arr))
+receiving_thread = threading.Thread(target=draw_graph, args=(receive_port, arr))
 receiving_thread.start()
-threading.Timer(1, receive_data, [serial_port, arr])
-
-while True :
-    time.sleep(5)
+threading.Timer(3, receive_data, [receive_port, arr])

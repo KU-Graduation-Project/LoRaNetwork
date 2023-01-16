@@ -16,6 +16,7 @@ def make_port(port_name):
         bytesize=serial.EIGHTBITS
     )
     ser.isOpen()
+    print('receiver open')
 
     return ser
 
@@ -62,7 +63,7 @@ def save_data(data, byte_data):
 
 # Running Part
 # Setting Data,Port
-ser = make_port('COM4')
+ser = make_port('COM3')
 
 """
 data_ex = {
