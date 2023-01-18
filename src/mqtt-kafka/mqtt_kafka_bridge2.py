@@ -1,4 +1,5 @@
 import json
+import threading
 
 from pykafka import KafkaClient
 import paho.mqtt.client as mqtt
@@ -9,6 +10,7 @@ mqtt_client = mqtt.Client('MQTTConsumer')
 mqtt_client.connect(mqtt_broker_address)
 
 kafka_client = KafkaClient(hosts='localhost:9092')
+
 
 def on_message(client, userdata, message):
     m_decode = str(message.payload.decode("utf-8", "ignore"))
@@ -23,8 +25,22 @@ def on_message(client, userdata, message):
     kafka_producer.produce(str(msg_payload).encode('ascii'))
     print('KAFKA : Just published ' + str(msg_payload) + 'to' + topic)
 
-mqtt_client.loop_start()
-mqtt_client.subscribe('test2') #토픽 지정
-mqtt_client.on_message = on_message
-time.sleep(400)
-mqtt_client.loop_stop()
+
+def on_client(topic):
+    mqtt_client.loop_start()
+    mqtt_client.subscribe(topic)  # 토픽 지정
+    mqtt_client.on_message = on_message
+    time.sleep(400)
+    mqtt_client.loop_stop()
+
+
+t2 = threading.Thread(target=on_client("test2"))
+t3 = threading.Thread(target=on_client("test3"))
+t4 = threading.Thread(target=on_client("test4"))
+t5 = threading.Thread(target=on_client("test5"))
+
+t2.start()
+t3.start()
+t4.start()
+t5.start()
+
