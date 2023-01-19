@@ -2,6 +2,7 @@ import json
 import paho.mqtt.client as mqtt
 from random import uniform
 import time
+from datetime import datetime
 
 mqtt_broker_address = '127.0.0.1'
 mqtt_client = mqtt.Client('MQTTProducer')
@@ -9,8 +10,9 @@ mqtt_client.connect(mqtt_broker_address)
 
 while True:
         randNumber = uniform(20.0, 21.0)
+        timestamp = datetime.now()
         # json으로 encode해서 publish
-        mqtt_client.publish("test3", json.dumps({"user": "test3", "data": randNumber}), 1)
-        print('test3_MQTT : published ' + str(randNumber))
+        mqtt_client.publish("user3", json.dumps({"user": "user3", "timestamp": str(timestamp), "data": randNumber}), 1)
+        print('user3_MQTT published : ' + str(timestamp) + ' - ' + str(randNumber))
 
         time.sleep(4)
