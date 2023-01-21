@@ -6,6 +6,7 @@ from pykafka import KafkaClient
 import paho.mqtt.client as mqtt
 import time
 
+"mqtt 브로커에서 데이터 받아 user별로 카프카에 전달"
 
 #mosquitto연결
 mqtt_broker_address = '127.0.0.1'
@@ -68,7 +69,4 @@ t3.join()
 t4.join()
 t5.join()
 
-# cursor 닫기
-cur.close()
-# db connection 닫기
-conn.close()
+

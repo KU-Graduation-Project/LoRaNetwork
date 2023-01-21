@@ -5,6 +5,7 @@ from json import dumps
 import pymysql
 from kafka import KafkaConsumer
 
+"""user# 토픽에서 데이터 받아 db에 저장"""
 
 def kafka_to_db(topic):
     # DB연결
@@ -17,7 +18,7 @@ def kafka_to_db(topic):
     sql = 'CREATE TABLE ' + topic + ' (timestamp datetime, ' \
                                     'g_x decimal(6,3), g_y decimal(6,3), g_z decimal(6,3), ' \
                                     'a_x decimal(6,3), a_y decimal(6,3), a_z decimal(6,3),' \
-                                    'heartrate int(3), resp int(3))'
+                                    'heartrate int(3), resp int(3), temp(3))'
     cur.execute(sql)
     conn.commit()
 
