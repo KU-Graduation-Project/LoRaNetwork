@@ -1,5 +1,5 @@
 import json
-import threading
+import multiprocessing
 
 
 from pykafka import KafkaClient
@@ -38,35 +38,11 @@ def on_client(mqtt_topic):
     time.sleep(400)
     mqtt_client.loop_stop()
 
+user_list = ["user1", "user2", "user3", "user4", "user5", "user6", "user7", "user8", "user9", "user10"]
 
-"""
-if __name__ == '__main__':
-    start = time.perf_counter()
-    threads = []
-    for _ in range(10):
-        t = threading.Thread(target=on_client("user"+str(_)))
-        t.start()
-        threads.append(t)
-
-    for thread in threads:
-        thread.join()
-"""
-t1 = threading.Thread(target=on_client("user1"))
-t2 = threading.Thread(target=on_client("user2"))
-t3 = threading.Thread(target=on_client("user3"))
-t4 = threading.Thread(target=on_client("user4"))
-t5 = threading.Thread(target=on_client("user5"))
-
-t1.start()
-t2.start()
-t3.start()
-t4.start()
-t5.start()
-
-t1.join()
-t2.join()
-t3.join()
-t4.join()
-t5.join()
+if __name__=='__main__':
+    # 컨슈머 멀티프로세싱
+    pool = multiprocessing.Pool(processes=10)
+    pool.map(on_client, user_list)
 
 
