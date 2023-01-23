@@ -6,8 +6,6 @@ import paho.mqtt.client as mqtt
 from random import randint
 import time
 
-now = datetime.now()
-
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
         global Connected
@@ -16,9 +14,9 @@ def on_connect(client, userdata, flags, rc):
         print("Connection failed")
 
 
-def client_connect():
+def client_connect(user):
     # MQTT connection
-    cli = "producer" + str(now.strftime('%Y-%m-%d %H:%M:%S'))
+    cli = "producer" + user
     mqtt_client = mqtt.Client(cli)
     mqtt_client.on_connect = on_connect
 
@@ -32,9 +30,10 @@ def client_connect():
 
 
 def make_producer(user) :
-    mqtt_client = client_connect()
+    mqtt_client = client_connect(user)
     while True:
         randNumber = randint(0, 360)
+        now = datetime.now()
         timestamp = now.strftime('%Y-%m-%d %H:%M:%S')
         # json으로 encode해서 publish
         if mqtt_client.publish(user, json.dumps({"user": user, "timestamp": str(timestamp), "data": randNumber}), 1):
@@ -42,11 +41,10 @@ def make_producer(user) :
 
         time.sleep(4)
 
-user_list = ["user1", "user2", "user3", "user4", "user5"]
-#"user6", "user7", "user8", "user9", "user10"
+user_list = ["user1", "user2", "user3", "user4", "user5", "user6", "user7", "user8", "user9", "user10"]
 
 
 if __name__=='__main__':
     # 컨슈머 멀티프로세싱
-    pool = multiprocessing.Pool(processes=5)
+    pool = multiprocessing.Pool(processes=10)
     pool.map(make_producer, user_list)
