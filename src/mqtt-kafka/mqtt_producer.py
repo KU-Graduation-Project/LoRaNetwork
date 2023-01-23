@@ -1,10 +1,12 @@
 import json
 import multiprocessing
+from datetime import datetime
 
 import paho.mqtt.client as mqtt
 from random import randint
 import time
-from datetime import datetime
+
+now = datetime.utcnow()
 
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
@@ -16,7 +18,7 @@ def on_connect(client, userdata, flags, rc):
 
 def client_connect():
     # MQTT connection
-    cli = "producer" + str(datetime.now())
+    cli = "producer" + str(now.strftime('%Y-%m-%d %H:%M:%S'))
     mqtt_client = mqtt.Client(cli)
     mqtt_client.on_connect = on_connect
 
@@ -33,7 +35,7 @@ def make_producer(user) :
     mqtt_client = client_connect()
     while True:
         randNumber = randint(0, 360)
-        timestamp = datetime.now()
+        timestamp = now.strftime('%Y-%m-%d %H:%M:%S')
         # json으로 encode해서 publish
         if mqtt_client.publish(user, json.dumps({"user": user, "timestamp": str(timestamp), "data": randNumber}), 1):
             print(user+'_MQTT published : ' + json.dumps({"user": user, "timestamp": str(timestamp), "data": randNumber}))

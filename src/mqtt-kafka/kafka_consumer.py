@@ -16,16 +16,16 @@ class MessageConsumer:
         self.topic = topic
         # DB연결
         conn = pymysql.connect(host='127.0.0.1', user='root', password='password', db='motionDB', charset='utf8')
-        cur = conn.cursor()
+        self.cur = conn.cursor()
         sql = 'DROP TABLE IF EXISTS ' + self.topic
-        cur.execute(sql)
+        self.cur.execute(sql)
 
         print(self.topic + " table created")
-        sql = 'CREATE TABLE ' + self.topic + ' (timestamp datetime, ' \
-                                             'g_x decimal(6,3), g_y decimal(6,3), g_z decimal(6,3), ' \
-                                             'a_x decimal(6,3), a_y decimal(6,3), a_z decimal(6,3),' \
+        sql = 'CREATE TABLE ' + self.topic + ' (timestamp datetime PRIMARY KEY, ' \
+                                             'g_x int(3), g_y int(3), g_z int(3), ' \
+                                             'a_x int(3), a_y int(3), a_z int(3),' \
                                              'heartrate int(3), resp int(3), temp int(3))'
-        cur.execute(sql)
+        self.cur.execute(sql)
         conn.commit()
 
         self.activate_listener()
@@ -45,20 +45,20 @@ class MessageConsumer:
         try:
             for message in consumer:
                 m_decode = str(message.value.decode("utf-8", "ignore"))
+                m_in = m_decode[2:len(m_decode)-1]
 
-                print(self.topic + " original m : " + str(message.value))
-                print(self.topic + " m_decode : " + m_decode)
+                print(self.topic + " kafka m_in : " + m_in)
 
-                m_in = json.loads(str(m_decode,'utf-8'))
-                m_json = json.dumps(m_in)
+
+                m_json = json.loads(m_in)
                 timestamp = m_json["timestamp"]
                 g_x = m_json["data"]
-                sql = 'INSERT INTO' + self.topic + '(timestamp, g_x) VALUES (' + timestamp + ', ' + g_x + ');'
-                if self.cur.execute(sql):
+                sql = 'INSERT INTO ' + self.topic + ' (timestamp, g_x) VALUES (%s, %d);'
+                if self.cur.execute(sql.format(timestamp, g_x)):
                     print(self.topic + " message : " + m_json + " - to db")
-
                 # committing message manually after reading from the topic
                 consumer.commit()
+
         finally:
             consumer.close()
 
