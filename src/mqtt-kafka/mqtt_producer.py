@@ -14,7 +14,7 @@ def on_connect(client, userdata, flags, rc):
         print("Connection failed")
 
 
-def client_conn():
+def client_connect():
     # MQTT connection
     cli = "producer" + str(datetime.now())
     mqtt_client = mqtt.Client(cli)
@@ -30,13 +30,13 @@ def client_conn():
 
 
 def make_producer(user) :
-    mqtt_client = client_conn()
+    mqtt_client = client_connect()
     while True:
         randNumber = randint(0, 360)
         timestamp = datetime.now()
         # json으로 encode해서 publish
         if mqtt_client.publish(user, json.dumps({"user": user, "timestamp": str(timestamp), "data": randNumber}), 1):
-            print(user+'_MQTT published : ' + str(timestamp) +' - ' + str(randNumber))
+            print(user+'_MQTT published : ' + json.dumps({"user": user, "timestamp": str(timestamp), "data": randNumber}))
 
         time.sleep(4)
 
@@ -45,5 +45,5 @@ user_list = ["user1", "user2", "user3", "user4", "user5", "user6", "user7", "use
 
 if __name__=='__main__':
     # 컨슈머 멀티프로세싱
-    pool = multiprocessing.Pool(processes=3)
+    pool = multiprocessing.Pool(processes=10)
     pool.map(make_producer, user_list)
