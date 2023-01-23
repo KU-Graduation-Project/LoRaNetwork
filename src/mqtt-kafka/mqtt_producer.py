@@ -6,7 +6,7 @@ import paho.mqtt.client as mqtt
 from random import randint
 import time
 
-now = datetime.utcnow()
+now = datetime.now()
 
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
@@ -42,10 +42,11 @@ def make_producer(user) :
 
         time.sleep(4)
 
-user_list = ["user1", "user2", "user3", "user4", "user5", "user6", "user7", "user8", "user9", "user10"]
+user_list = ["user1", "user2", "user3", "user4", "user5"]
+#"user6", "user7", "user8", "user9", "user10"
 
 
 if __name__=='__main__':
     # 컨슈머 멀티프로세싱
-    pool = multiprocessing.Pool(processes=10)
+    pool = multiprocessing.Pool(processes=5)
     pool.map(make_producer, user_list)
