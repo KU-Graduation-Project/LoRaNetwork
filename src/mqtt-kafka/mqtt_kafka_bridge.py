@@ -34,9 +34,10 @@ def on_message(client, userdata, message):
     print('KAFKA out - ' + str(json.dumps(m_in).encode('utf-8')) + ' to ' + topic)
 
 
-user_list = ["user1", "user2", "user3", "user4", "user5", "user6", "user7", "user8", "user9", "user10"]
+user_list = ["user1", "user2", "user3", "user4", "user5"]
+# "user6", "user7", "user8", "user9", "user10"
 
 if __name__ == '__main__':
     # 컨슈머 멀티프로세싱
-    pool = multiprocessing.Pool(processes=10)
+    pool = multiprocessing.Pool(processes=5)
     pool.map(connect, user_list)
