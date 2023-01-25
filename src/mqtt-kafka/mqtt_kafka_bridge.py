@@ -29,9 +29,8 @@ def on_message(client, userdata, message):
     kafka_producer = KafkaProducer(bootstrap_servers='localhost:9092',
                                    value_serializer=lambda v: json.dumps(v).encode('utf-8'))
 
-    print('MQTT in - ', message.payload)
     kafka_producer.send(topic, m_in)
-    print('KAFKA out - ' + str(json.dumps(m_in).encode('utf-8')) + ' to ' + topic)
+    print('MQTT in KAFKA out - ' + str(json.dumps(m_in).encode('utf-8')) + ' to ' + topic)
 
 
 user_list = ["user1", "user2", "user3", "user4", "user5", "user6", "user7", "user8", "user9", "user10"]

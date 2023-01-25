@@ -47,8 +47,6 @@ class MessageConsumer:
                 m_decode = str(message.value.decode("utf-8", "ignore"))
                 m_in = m_decode[:len(m_decode)]
 
-                print(self.topic + " kafka m_in : " + m_in)
-
 
                 m_json = json.loads(m_in)
                 timestamp = m_json["timestamp"]
