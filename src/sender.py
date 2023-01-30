@@ -4,7 +4,8 @@ import numpy as np
 import threading
 import struct
 
-# portName : COM4, rate : baundrate other side of rate,
+# uLory sender(COM4)
+# portName : COM4
 # byte_size : data size
 def make_port(port_name, rate, byte_size):
     if byte_size == 8:

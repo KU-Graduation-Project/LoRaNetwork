@@ -4,7 +4,7 @@ import time
 import pandas as pd
 import struct
 
-
+# ioLory receiver(COM3)
 # Making serial port
 # port_name : Using port name
 def make_port(port_name):
