@@ -1,7 +1,8 @@
 import threading
-import serial
 import time
-import pandas as pd
+from datetime import datetime
+
+import serial
 import struct
 
 # ioLory receiver(COM3)
@@ -11,9 +12,10 @@ def make_port(port_name):
     ser = serial.Serial(
         port=port_name,
         baudrate=9600,
-        parity=serial.PARITY_ODD,
+        parity=serial.PARITY_NONE,
         stopbits=serial.STOPBITS_TWO,
-        bytesize=serial.EIGHTBITS
+        bytesize=serial.EIGHTBITS,
+        timeout=1
     )
     ser.isOpen()
     print('receiver open')
@@ -24,21 +26,14 @@ def make_port(port_name):
 # Receiving Data, Thread 1, this function read byte data from serial port and save in datalist
 # ser : serial port
 # datalist : global memory for sharing data with other threads
-#
+
 def receive_data(ser):
+    now = datetime.now()
+    timestamp = now.strftime('%Y-%m-%d %H:%M:%S')
     # threading.Timer(1, receive_data, [ser, byte_data]).start()
-
-
     if ser.readable():
         res = ser.readline()
-        print(res)
-        """
-        for i in range(len(datalist)):
-            datalist[i] = ser.read()
-            save_data(data, datalist)
-            print(datalist)
-        """
-
+        print("receive data: ",timestamp," / ", res)
     return
 
 
@@ -59,42 +54,10 @@ def save_data(data, byte_data):
 
 
 # class repeatTimer(timer) :
-
-
 # Running Part
 # Setting Data,Port
 ser = make_port('COM3')
 
-"""
-data_ex = {
-    'intData': [10],
-    'floatData': [36.5],
-    'charData': ['h']
-}
-data = pd.DataFrame(data_ex, columns=['intData', 'floatData', 'charData'])
-i = 184
-y = 0.264
-c = 'g'
-bi = i.to_bytes(4, 'big')
-by = struct.pack('f', y)
-bc = bytes(c, 'utf-8')
-byte_data = [bi, by, bc]
-
-t1 = threading.Timer(1, receive_data, [ser, byte_data])
-# receive -> save data로 바로 , receive&save 같이
-# graph thread만
-t2 = threading.Timer(1, save_data, [data, byte_data])
-
-t1.start()
-time.sleep(1)
-t2.start()
-"""
-
 while True:
-    if receive_data(ser):
-        print("receiving thread")
-
-time.sleep(5)
-# print(byte_data)
-print("end")
-
+    receive_data(ser)
+    time.sleep(4)
