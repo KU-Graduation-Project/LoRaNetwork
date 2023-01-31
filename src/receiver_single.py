@@ -30,9 +30,8 @@ def make_port(port_name):
 def receive_data(ser):
     now = datetime.now()
     timestamp = now.strftime('%Y-%m-%d %H:%M:%S')
-    # threading.Timer(1, receive_data, [ser, byte_data]).start()
     if ser.readable():
-        res = ser.readline()
+        res = ser.read()
         print("receive data: ",timestamp," / ", res)
     return
 
@@ -53,11 +52,11 @@ def save_data(data, byte_data):
     return data
 
 
-# class repeatTimer(timer) :
-# Running Part
-# Setting Data,Port
+# Running Port
 ser = make_port('COM3')
 
 while True:
+    ser.write(b'check serial data')
+    print(ser.readline())
     receive_data(ser)
     time.sleep(4)
