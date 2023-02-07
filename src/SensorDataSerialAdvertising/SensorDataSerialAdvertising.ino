@@ -3,7 +3,12 @@
 
 //Create a instance of class LSM6DS3
 LSM6DS3 myIMU(I2C_MODE, 0x6A);    //I2C device address 0x6A
+
 #define CONVERT_TO_MS2    9.80665f
+#define FREQUENCY_HZ        50
+#define INTERVAL_MS         (1000 / (FREQUENCY_HZ + 1))
+
+static unsigned long last_interval_ms = 0;               
 
 void setup() {
     // put your setup code here, to run once:
@@ -18,6 +23,9 @@ void setup() {
 }
 
 void loop() {
+
+   if (millis() > last_interval_ms + INTERVAL_MS) {
+        last_interval_ms = millis();
     //Accelerometer
     Serial.print(myIMU.readFloatAccelX() * CONVERT_TO_MS2,4);
     Serial.print('\t');
@@ -36,6 +44,5 @@ void loop() {
 
     //Thermometer
     Serial.println(myIMU.readTempC());
-
-    delay(1000);
+   }
 }
