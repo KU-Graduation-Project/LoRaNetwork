@@ -2,7 +2,7 @@
 #include <LSM6DS3.h>
 
 BLEService myService("fff0");
-BLEIntCharacteristic AccXSensorLevel("fff1", BLERead | BLEBroadcast);
+BLEIntCharacteristic myCharacteristic("fff1", BLERead | BLEBroadcast);
 
 
 //IMU 6축 데이터 가져오기 위한 보드객체 생성
@@ -22,9 +22,9 @@ void setup() {
     while (1);
   }
 
-  myService.addCharacteristic(AccXSensorLevel);
+  myService.addCharacteristic(myCharacteristic);
   BLE.addService(myService);
-  AccXSensorLevel.writeValue(0);
+  myCharacteristic.writeValue(0);
   
   // Build advertising data packet
   BLEAdvertisingData advData;
@@ -54,9 +54,9 @@ void loop() {
     digitalWrite(LED_BUILTIN, LOW);   
     delay(500);
 
-    //float AX;
-    //AX = myIMU.readFloatAccelX();
-    //AccXSensorLevel.writeValue(AX);
+    float AX;
+    //AX = myIMU.readFloatAccelX(); //얘 넣을 시 데드락 걸리는 듯. 블루투스 통신 안됨.
+    //myCharacteristic.writeValue(AX);
     
     BLE.poll();
   }
