@@ -4,13 +4,12 @@
 BLEService myService("fff0");
 BLEIntCharacteristic myCharacteristic("fff1", BLERead | BLEBroadcast);
 
-
 //IMU 6축 데이터 가져오기 위한 보드객체 생성
 LSM6DS3 myIMU(I2C_MODE, 0x6A);    //I2C device address 0x6A
 
 
 // Advertising parameters should have a global scope. Do NOT define them in 'setup' or in 'loop'
-const uint8_t completeRawAdvertisingData[] = {0x02,0x01,0x06,0x09,0xff,0x01,0x01,0x00,0x01,0x02,0x03,0x04,0x05};   
+//const uint8_t completeRawAdvertisingData[] = {0x02,0x01,0x06,0x09,0xff,0x01,0x01,0x00,0x01,0x02,0x03,0x04,0x05};   
 
 
 void setup() {               
@@ -28,9 +27,14 @@ void setup() {
   
   // Build advertising data packet
   BLEAdvertisingData advData;
-  // If a packet has a raw data parameter, then all the other parameters of the packet will be ignored
-  advData.setRawData(completeRawAdvertisingData, sizeof(completeRawAdvertisingData));  
-  // Copy set parameters in the actual advertising packet
+  //advData.setRawData(completeRawAdvertisingData, sizeof(completeRawAdvertisingData));
+
+  //String resultString = "UpDown";
+  char* resultString = "UpDown";
+  uint8_t testRawAdvertisingData[] = {};
+  testRawAdvertisingData = reinterpret_cast<uint8_t*>(resultString);
+  advData.setRawData(testRawAdvertisingData, sizeof(testRawAdvertisingData));
+  
   BLE.setAdvertisingData(advData);
   
   // Build scan response data packet

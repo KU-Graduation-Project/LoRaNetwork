@@ -3,18 +3,23 @@
 #include <Wire.h>
 #include <Kaya-project-1_inferencing.h>
 
+
 #define CONVERT_TO_MS2    9.80665f
 #define MAX_ACCEPTED_RANGE  2.0f
 
 LSM6DS3 myIMU(I2C_MODE, 0x6A);
 static bool debug_nn = false;
 
+BLEService myService("fff0");
+BLEIntCharacteristic myCharacteristic("fff1", BLERead | BLEBroadcast);
+
+
 void setup() {
   
     //Serial.begin(9600);
 
    if (!BLE.begin()){
-     //Serial.println("failed to initialize BLE!");
+     Serial.println("failed to initialize BLE!");
      while (1);
    }
     
@@ -33,6 +38,17 @@ void setup() {
         return;
     }
 
+
+    //BLE setup
+    BLEAdvertisingData advData;
+    advData.setRawData(completeRawAdvertisingData, sizeof(completeRawAdvertisingData));
+    BLE.setAdvertisingData(advData);
+
+    BLEAdvertisingData scanData;
+    scanData.setLocalName("Test advertising raw data");
+    BLE.setScanResponseData(scanData);
+  
+    BLE.advertise();
 
 }
 
@@ -104,14 +120,14 @@ void loop() {
     if(0.1 < result.classification[0].value && result.classification[0].value < 0.5){
       //LeftRight
       ei_printf("---- LeftRight ----");
-      delay(3000);
+      delay(1000);
     }else if(result.classification[1].value > 0.87891){
       //UpDown
       ei_printf("----- UpDown  -----");
-      delay(3000);      
+      delay(1000);      
     }else{
       //idle
       ei_printf("-----  Idle  -----");
-      delay(3000);
+      delay(1000);
     }
 }
