@@ -16,7 +16,7 @@ BLEIntCharacteristic myCharacteristic("fff1", BLERead | BLEBroadcast);
 
 void setup() {
   
-    //Serial.begin(9600);
+   Serial.begin(9600);
 
    if (!BLE.begin()){
      Serial.println("failed to initialize BLE!");
@@ -39,14 +39,10 @@ void setup() {
     }
 
 
-    //BLE setup
-    BLEAdvertisingData advData;
-    advData.setRawData(completeRawAdvertisingData, sizeof(completeRawAdvertisingData));
-    BLE.setAdvertisingData(advData);
-
-    BLEAdvertisingData scanData;
-    scanData.setLocalName("Test advertising raw data");
-    BLE.setScanResponseData(scanData);
+    BLE.setLocalName("Test motion");
+    myService.addCharacteristic(myCharacteristic);
+    BLE.addService(myService);
+    
   
     BLE.advertise();
 
@@ -57,6 +53,8 @@ float ei_get_sign(float number) {
 }
 
 void loop() {
+  
+    BLEDevice central = BLE.central();
     
     ei_printf("\nSampling...\n");
  
@@ -120,14 +118,20 @@ void loop() {
     if(0.1 < result.classification[0].value && result.classification[0].value < 0.5){
       //LeftRight
       ei_printf("---- LeftRight ----");
+      myCharacteristic.writeValue(0101);
+      BLE.advertise();
       delay(1000);
     }else if(result.classification[1].value > 0.87891){
       //UpDown
       ei_printf("----- UpDown  -----");
+      myCharacteristic.writeValue(4321);
+      BLE.advertise();
       delay(1000);      
     }else{
       //idle
       ei_printf("-----  Idle  -----");
+      myCharacteristic.writeValue(00);
+      BLE.advertise();
       delay(1000);
     }
 }
