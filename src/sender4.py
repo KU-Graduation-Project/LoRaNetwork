@@ -18,7 +18,7 @@ def make_port(port_name, baud_rate, byte_size):
         parity=serial.PARITY_NONE,
         stopbits=serial.STOPBITS_TWO,
         bytesize=serial.EIGHTBITS,
-        timeout=1
+        timeout=0.02
     )
 
     ser.isOpen()
@@ -32,6 +32,16 @@ def send_data(data):
 ## Running port
 serial_port = make_port('COM4', 9600, 8)
 
+'''
+while True:
+    jsondata = bytearray(json.dumps({"set": "initial set"}), encoding='utf-8')
+    send_data(jsondata)
+    #time.sleep(1)
+    res = serial_port.readline()
+    print(" / ", res)
+    if res == b'{"tick": "4"}':
+        break
+'''
 
 while True:
     user = "user4"
@@ -42,5 +52,5 @@ while True:
     jsondata = bytearray(json.dumps({"user": user, "timestamp": str(timestamp), "data": randNumber}), encoding='utf-8')
     send_data(jsondata)
     print("data sent: ", timestamp, " / ", randNumber)
-    time.sleep(1)
+    time.sleep(2)
 

@@ -1,3 +1,4 @@
+import json
 import threading
 import time
 from datetime import datetime
@@ -16,7 +17,7 @@ def make_port(port_name):
         parity=serial.PARITY_NONE,
         stopbits=serial.STOPBITS_TWO,
         bytesize=serial.EIGHTBITS,
-        timeout=1
+        timeout=0.05
     )
     ser.isOpen()
     print('receiver open')
@@ -32,7 +33,9 @@ def receive_data(serial_port):
     now = datetime.now()
     timestamp = now.strftime('%Y-%m-%d %H:%M:%S')
     if serial_port.readable():
-        res = serial_port.read()
+        res = serial_port.readline()
+        if res == b'{"set": "initial set"}':
+            set_tick()
         print("receive data: ", timestamp, " / ", res)
     return
 
@@ -53,15 +56,21 @@ def save_data(data, byte_data):
     return data
 
 
+def set_tick():
+    tick_data = bytearray(json.dumps({"tick": tick}), encoding='utf-8')
+    serial_port.write(tick_data)
+
+
 # Running Port
 serial_port = make_port('COM5')
+tick = 1
 
 while True:
     # ser.write(b'check serial data')
-    print(serial_port.readline())
+    # print(serial_port.readline())
     receive_data(serial_port)
+    if tick == 9:
+        tick == 1
+    else:
+        tick += 1
     time.sleep(0.1)
-
-
-
-
