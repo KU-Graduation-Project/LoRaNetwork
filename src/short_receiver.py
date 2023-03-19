@@ -2,6 +2,7 @@ import json
 import threading
 import time
 from datetime import datetime
+import socket
 
 import serial
 import struct
@@ -32,11 +33,14 @@ def make_port(port_name):
 def receive_data(serial_port):
     now = datetime.now()
     timestamp = now.strftime('%Y-%m-%d %H:%M:%S')
+
+
     if serial_port.readable():
         res = serial_port.readline()
-        if res == b'{"set": "initial set"}':
-            set_tick()
+        #if res == b'{"set": "initial set"}':
+        #    set_tick()
         print("receive data: ", timestamp, " / ", res)
+        client_socket.sendall(res)
     return
 
 
@@ -61,6 +65,14 @@ def set_tick():
     serial_port.write(tick_data)
 
 
+# open socket client
+Host = '127.0.0.1'
+Port = 9999
+
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client_socket.connect((Host, Port))
+
+
 # Running Port
 serial_port = make_port('COM5')
 tick = 1
@@ -74,3 +86,6 @@ while True:
     else:
         tick += 1
     time.sleep(0.1)
+
+
+client_socket.close()
