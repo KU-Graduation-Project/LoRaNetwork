@@ -1,4 +1,6 @@
-##Read File 
+##Read File
+from datetime import datetime
+
 import serial
 import time
 import threading
@@ -37,7 +39,7 @@ class multiReceive:
                     break
                     
 ser1 = make_port('COM4')
-ser2 = make_port('COM5')
+ser2 = make_port('COM6')
 
 mr = multiReceive()
 mr.add_port(ser1)

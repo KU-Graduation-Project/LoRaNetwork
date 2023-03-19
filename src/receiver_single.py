@@ -5,7 +5,8 @@ from datetime import datetime
 import serial
 import struct
 
-# ioLory receiver(COM3)
+
+# ioLory receiver(COM5)
 # Making serial port
 # port_name : Using port name
 def make_port(port_name):
@@ -27,12 +28,12 @@ def make_port(port_name):
 # ser : serial port
 # datalist : global memory for sharing data with other threads
 
-def receive_data(ser):
+def receive_data(serial_port):
     now = datetime.now()
     timestamp = now.strftime('%Y-%m-%d %H:%M:%S')
-    if ser.readable():
-        res = ser.read()
-        print("receive data: ",timestamp," / ", res)
+    if serial_port.readable():
+        res = serial_port.read()
+        print("receive data: ", timestamp, " / ", res)
     return
 
 
@@ -53,10 +54,14 @@ def save_data(data, byte_data):
 
 
 # Running Port
-ser = make_port('COM3')
+serial_port = make_port('COM5')
 
 while True:
-    ser.write(b'check serial data')
-    print(ser.readline())
-    receive_data(ser)
-    time.sleep(4)
+    # ser.write(b'check serial data')
+    print(serial_port.readline())
+    receive_data(serial_port)
+    time.sleep(0.1)
+
+
+
+

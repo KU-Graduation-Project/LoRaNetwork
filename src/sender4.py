@@ -6,7 +6,7 @@ from random import randint
 import serial
 import struct
 
-# uLory sender(COM4)
+# uLory sender(COM4/COM6)
 # byte_size : data size
 def make_port(port_name, baud_rate, byte_size):
     if byte_size == 8:
@@ -34,12 +34,13 @@ serial_port = make_port('COM4', 9600, 8)
 
 
 while True:
-    user = "user1"
-    randNumber = randint(0, 360)
+    user = "user4"
+    #randNumber = randint(0, 360)
+    randNumber = 4
     now = datetime.now()
     timestamp = now.strftime('%Y-%m-%d %H:%M:%S')
     jsondata = bytearray(json.dumps({"user": user, "timestamp": str(timestamp), "data": randNumber}), encoding='utf-8')
     send_data(jsondata)
     print("data sent: ", timestamp, " / ", randNumber)
-    time.sleep(4)
+    time.sleep(1)
 
