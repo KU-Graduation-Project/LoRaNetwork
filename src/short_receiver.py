@@ -48,6 +48,7 @@ def receive_data(serial_port):
 
     if serial_port.readable():
         res = serial_port.readline()
+        print("receive data: ", timestamp, " / ", res)
         '''
         if res == b'{"set": "initial set"}':
             count = 1
