@@ -55,7 +55,7 @@ while True:
         break
     print('Received from', addr, data.decode())
     #단거리 데이터 받아서 장거리 소켓으로 보내기
-    if client_socket.sendall(data) : print("socket send data")
+    if long_client_socket.sendall(data) : print("socket send data")
 
 
 client_socket.close()
