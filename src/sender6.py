@@ -18,7 +18,7 @@ def make_port(port_name, baud_rate, byte_size):
         parity=serial.PARITY_NONE,
         stopbits=serial.STOPBITS_TWO,
         bytesize=serial.EIGHTBITS,
-        timeout=0.5
+        timeout=0.05
     )
 
     ser.isOpen()
@@ -32,16 +32,16 @@ def send_data(data):
 ## Running port
 serial_port = make_port('COM6', 9600, 8)
 
-'''
+
 while True:
     jsondata = bytearray(json.dumps({"set": "initial set"}), encoding='utf-8')
     send_data(jsondata)
-    time.sleep(0.5)
     res = serial_port.readline()
     print(" / ", res)
-    if res == b'{"tick": "6"}':
+    if res == b'{"tick": 6}':
         break
-'''
+    time.sleep(0.1)
+
 
 while True:
     user = "user6"
@@ -49,7 +49,7 @@ while True:
     now = datetime.now()
     timestamp = now.strftime('%Y-%m-%d %H:%M:%S')
     jsondata = bytearray(json.dumps({"user": user, "timestamp": str(timestamp), "data": randNumber}), encoding='utf-8')
-    send_data(jsondata)
-    print("data sent: ", timestamp, " / ", randNumber)
+    if send_data(jsondata):
+        print("data sent: ", timestamp, " / ", randNumber)
     time.sleep(2)
 

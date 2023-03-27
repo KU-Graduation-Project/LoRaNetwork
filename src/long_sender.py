@@ -47,7 +47,8 @@ while True:
     if not data:
         break
     print('Received from', addr, data.decode())
-    if serial_port.write(data) : print("long send succeeded")
+    #단거리 데이터 받아서 장거리로 보내기
+    #if serial_port.write(data) : print("long send succeeded")
 
 
 client_socket.close()
