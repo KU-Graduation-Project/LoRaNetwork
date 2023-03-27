@@ -46,8 +46,8 @@ print('Connected by ', addr)
 send_Host = '127.0.0.1'
 send_Port = 9998
 
-client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client_socket.connect((send_Host, send_Port))
+long_client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+long_client_socket.connect((send_Host, send_Port))
 
 while True:
     data = client_socket.recv(2048)
@@ -60,4 +60,5 @@ while True:
 
 client_socket.close()
 server_socket.close()
+long_client_socket.close()
 
