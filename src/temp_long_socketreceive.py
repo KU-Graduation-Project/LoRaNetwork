@@ -3,12 +3,13 @@ import socket
 # receive data through socket
 
 Host = '127.0.0.1'
-Port = 9999
+Port = 9998
 
 #open socket server
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 server_socket.bind((Host, Port))
+print('socket server open')
 
 server_socket.listen()
 
