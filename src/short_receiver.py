@@ -48,12 +48,14 @@ def receive_data(serial_port):
 
     if serial_port.readable():
         res = serial_port.readline()
+        '''
         if res == b'{"set": "initial set"}':
             count = 1
         print("tick:", tick, " /receive data: ", timestamp, " / ", res)
         if count < 10:
             set_tick()
             count += 1
+        '''
         client_socket.sendall(res)
     return
 
