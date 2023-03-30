@@ -44,16 +44,16 @@ while True:
 '''
 
 while True:
-    user = "user4"
-    randNumber1 = randint(0, 360)
-    randNumber2 = randint(0, 360)
-    randNumber3 = randint(0, 360)
+    deviceId = "2889"
+    randNumber1 = randint(90, 120)
+    randNumber2 = randint(90, 120)
+    randNumber3 = randint(35, 38)
     #randNumber = 4
     now = datetime.now()
     timestamp = now.strftime('%Y-%m-%d %H:%M:%S')
     #jsondata = bytearray(json.dumps({"user": user, "timestamp": str(timestamp), "g_x": randNumber, "g_y": randNumber, "g_z": randNumber}), encoding='utf-8')
                                      #"a_x": randNumber, "a_y": randNumber, "a_z": randNumber, "heartrate": randNumber, "resp": randNumber, "temp": randNumber}), encoding='utf-8')
-    jsondata = bytearray(json.dumps({"user": user, "timestamp": str(timestamp), "heartrate": randNumber1, "resp": randNumber2, "temp": randNumber3}),
+    jsondata = bytearray(json.dumps({"deviceId": deviceId, "timestamp": str(timestamp), "heartrate": randNumber1, "resp": randNumber2, "temp": randNumber3}),
                          encoding='utf-8')
     send_data(jsondata)
     print("data sent: ", timestamp, " / ", randNumber1, " ", randNumber2, " ", randNumber3)

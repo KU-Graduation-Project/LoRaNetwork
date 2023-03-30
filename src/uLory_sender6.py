@@ -18,7 +18,7 @@ def make_port(port_name, baud_rate, byte_size):
         parity=serial.PARITY_NONE,
         stopbits=serial.STOPBITS_TWO,
         bytesize=serial.EIGHTBITS,
-        timeout=0.05
+        timeout=0.02
     )
 
     ser.isOpen()
@@ -32,24 +32,30 @@ def send_data(data):
 ## Running port
 serial_port = make_port('COM6', 9600, 8)
 
-
+'''
 while True:
     jsondata = bytearray(json.dumps({"set": "initial set"}), encoding='utf-8')
     send_data(jsondata)
+    #time.sleep(1)
     res = serial_port.readline()
     print(" / ", res)
-    if res == b'{"tick": 6}':
+    if res == b'{"tick": "6"}':
         break
-    time.sleep(0.1)
-
+'''
 
 while True:
-    user = "user6"
-    randNumber = randint(0, 360)
+    deviceId = "2897"
+    randNumber1 = randint(90, 120)
+    randNumber2 = randint(90, 120)
+    randNumber3 = randint(35, 38)
+    #randNumber = 6
     now = datetime.now()
     timestamp = now.strftime('%Y-%m-%d %H:%M:%S')
-    jsondata = bytearray(json.dumps({"user": user, "timestamp": str(timestamp), "data": randNumber}), encoding='utf-8')
-    if send_data(jsondata):
-        print("data sent: ", timestamp, " / ", randNumber)
+    #jsondata = bytearray(json.dumps({"user": user, "timestamp": str(timestamp), "g_x": randNumber, "g_y": randNumber, "g_z": randNumber}), encoding='utf-8')
+                                     #"a_x": randNumber, "a_y": randNumber, "a_z": randNumber, "heartrate": randNumber, "resp": randNumber, "temp": randNumber}), encoding='utf-8')
+    jsondata = bytearray(json.dumps({"deviceId": deviceId, "timestamp": str(timestamp), "heartrate": randNumber1, "resp": randNumber2, "temp": randNumber3}),
+                         encoding='utf-8')
+    send_data(jsondata)
+    print("data sent: ", timestamp, " / ", randNumber1, " ", randNumber2, " ", randNumber3)
     time.sleep(2)
 
