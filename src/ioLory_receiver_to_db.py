@@ -52,8 +52,8 @@ def receive_data(serial_port):
 
 
 def save_data(jsondata):
-
-    cur.execute('INSERT INTO sensor_data VALUES(data)', [json.dumps(jsondata)]),
+    data = json.loads(jsondata)
+    cur.execute('INSERT INTO sensor_data VALUES(data)', [json.dumps(data)]),
     return
 
 
