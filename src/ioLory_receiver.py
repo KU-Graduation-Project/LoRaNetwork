@@ -26,6 +26,7 @@ def make_port(port_name):
     return ser
 
 # open socket client
+# send data to web
 Host = '127.0.0.1'
 Port = 9999
 
