@@ -30,6 +30,7 @@ def make_port(port_name):
 serial_port = make_port('COM5')
 
 def make_db():
+    global conn
     conn = sqlite3.connect("sensordata.db")
     # if no sensordata.db make sensordata.db
     global cur
@@ -37,7 +38,7 @@ def make_db():
     conn.execute('CREATE TABLE sensor_data(ID INTEGER PRIMARY KEY AUTOINCREMENT, data json)')
     conn.commit()
 
-make_db()
+#make_db()
 
 
 def receive_data(serial_port):
@@ -46,19 +47,31 @@ def receive_data(serial_port):
 
     if serial_port.readable():
         data = serial_port.readline()
-        save_data(data)
-        print("receive data: ", timestamp, " / ", data)
+        if len(data) > 4:
+            save_data(data)
+            print("receive data: ", timestamp, " / ", data)
     return
 
 
 def save_data(jsondata):
-    data = json.loads(jsondata)
-    cur.execute('INSERT INTO sensor_data VALUES(data)', [json.dumps(data)]),
+    data = jsondata.decode('utf-8')
+    #if len(data)>4:
+        #cur.execute('INSERT INTO sensor_data (ID, data) VALUES(NULL, ?)', [json.dumps(data)])
+        #conn.commit()
     return
 
 
 
 while True:
+    if serial_port.readable():
+        data = serial_port.readline()
+        if len(data) > 4:
+            now = datetime.now()
+            timestamp = now.strftime('%Y-%m-%d %H:%M:%S')
+            save_data(data)
+            print("receive data: ", timestamp, " / ", data)
+    '''
     receive_data(serial_port)
     time.sleep(0.1)
+    '''
 
