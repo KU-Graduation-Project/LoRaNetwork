@@ -28,24 +28,13 @@ def make_port(port_name):
 
 # Running Port
 serial_port = make_port('/dev/ttyUSB0')
-
-def make_db():
-<<<<<<< HEAD
-    conn = sqlite3.connect("////home/pi/Downloads/marin/src/sensordata")
+ conn = sqlite3.connect("////home/pi/Downloads/marin/src/sensordata")
     # if no sensordata.db make sensordata.db
     global cur
     cur = conn.cursor()
     cur.execute('CREATE TABLE IF NOT EXISTS sensor_data(ID INTEGER PRIMARY KEY AUTOINCREMENT, data json)')
-=======
-    global conn
-    conn = sqlite3.connect("sensordata.db")
-    # if no sensordata.db make sensordata.db
-    global cur
-    cur = conn.cursor()
-    conn.execute('CREATE TABLE sensor_data(ID INTEGER PRIMARY KEY AUTOINCREMENT, data String)')
->>>>>>> ec256a176021365540df2facfb78b7aeff3a0249
-    conn.commit()
 
+    conn.commit()
 #make_db()
 
 
