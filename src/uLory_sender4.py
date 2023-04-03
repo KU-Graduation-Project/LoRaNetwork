@@ -32,30 +32,21 @@ def send_data(data):
 ## Running port
 serial_port = make_port('COM4', 9600, 8)
 
-'''
-while True:
-    jsondata = bytearray(json.dumps({"set": "initial set"}), encoding='utf-8')
-    send_data(jsondata)
-    #time.sleep(1)
-    res = serial_port.readline()
-    print(" / ", res)
-    if res == b'{"tick": "4"}':
-        break
-'''
 
 while True:
     deviceId = "2889"
+    randNumber = randint(-360, 360)
     randNumber1 = randint(90, 120)
     randNumber2 = randint(90, 120)
     randNumber3 = randint(35, 38)
     #randNumber = 4
     now = datetime.now()
-    timestamp = now.strftime('%Y-%m-%d %H:%M:%S')
-    #jsondata = bytearray(json.dumps({"user": user, "timestamp": str(timestamp), "g_x": randNumber, "g_y": randNumber, "g_z": randNumber}), encoding='utf-8')
-                                     #"a_x": randNumber, "a_y": randNumber, "a_z": randNumber, "heartrate": randNumber, "resp": randNumber, "temp": randNumber}), encoding='utf-8')
-    jsondata = bytearray(json.dumps({"deviceId": deviceId, "timestamp": str(timestamp), "heartrate": randNumber1, "resp": randNumber2, "temp": randNumber3}),
-                         encoding='utf-8')
-    send_data(jsondata)
-    print("data sent: ", timestamp, " / ", randNumber1, " ", randNumber2, " ", randNumber3)
+    timestamp = now.strftime('%H:%M:%S')
+    data = bytearray(str(deviceId)+" "+str(timestamp)+" "+ str(randNumber)+" "+ str(randNumber)+" "+str(randNumber)
+                                     +" "+str(randNumber)+" "+ str(randNumber)+" "+str(randNumber)+" "+str(randNumber1)+" "+str(randNumber2)+" "+str(randNumber3), encoding='utf-8')
+
+    #ax,ay,az,gx,gy,gz,heartrate,resp,temp
+    send_data(data)
+    print( timestamp, " / ", data)
     time.sleep(2)
 

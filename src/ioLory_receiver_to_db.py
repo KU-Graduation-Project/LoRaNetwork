@@ -35,7 +35,7 @@ def make_db():
     # if no sensordata.db make sensordata.db
     global cur
     cur = conn.cursor()
-    conn.execute('CREATE TABLE sensor_data(ID INTEGER PRIMARY KEY AUTOINCREMENT, data json)')
+    conn.execute('CREATE TABLE sensor_data(ID INTEGER PRIMARY KEY AUTOINCREMENT, data String)')
     conn.commit()
 
 #make_db()
@@ -53,8 +53,8 @@ def receive_data(serial_port):
     return
 
 
-def save_data(jsondata):
-    data = jsondata.decode('utf-8')
+def save_data(bytedata):
+    data = bytedata.decode('utf-8')
     #if len(data)>4:
         #cur.execute('INSERT INTO sensor_data (ID, data) VALUES(NULL, ?)', [json.dumps(data)])
         #conn.commit()
