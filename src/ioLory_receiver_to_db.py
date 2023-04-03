@@ -28,7 +28,7 @@ def make_port(port_name):
 
 # Running Port
 serial_port = make_port('/dev/ttyUSB0')
-conn = sqlite3.connect("////home/pi/Downloads/marin/src/sensordata")
+conn = sqlite3.connect("////home/pi/Downloads/marin/src/oceanlab")
 # if no sensordata.db make sensordata.db
 global cur
 cur = conn.cursor()
@@ -57,6 +57,14 @@ def save_data(bytedata):
     
     if(len(data)>10):
         null_data = None
+        strings = data.split(" ", 1)
+        did = strings[0]
+        
+        cur.execute("SELECT uid FROM user WHERE did = '%s'" % did)
+        data = data +" "+ str(cur.fetchall())[3:-4]
+        cur.execute("SELECT name FROM user WHERE did = '%s'" % did)
+        data = data +" "+ str(cur.fetchall())[3:-4]
+        
         cur.execute("INSERT INTO sensor_data VALUES(?,?)", (null_data, data))
         conn.commit()
 

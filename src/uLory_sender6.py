@@ -32,16 +32,6 @@ def send_data(data):
 ## Running port
 serial_port = make_port('COM6', 9600, 8)
 
-'''
-while True:
-    jsondata = bytearray(json.dumps({"set": "initial set"}), encoding='utf-8')
-    send_data(jsondata)
-    #time.sleep(1)
-    res = serial_port.readline()
-    print(" / ", res)
-    if res == b'{"tick": "6"}':
-        break
-'''
 
 while True:
     deviceId = "2897"
