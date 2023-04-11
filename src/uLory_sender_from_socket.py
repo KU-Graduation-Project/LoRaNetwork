@@ -1,4 +1,6 @@
 import socket
+from datetime import datetime
+
 import serial
 import struct
 import sqlite3
@@ -42,7 +44,9 @@ while True:
     client_socket, client_addr = server_socket.accept() #accept incoming client
     data = client_socket.recv(1024)  # 클라이언트가 보낸 메시지 반환
     send_data(data)
-    print("received :", data)
+    now = datetime.now()
+    timestamp = now.strftime('%Y-%m-%d %H:%M:%S')
+    print(timestamp, " received :", data)
     time.sleep(0.5)
 
 client_socket.close()
