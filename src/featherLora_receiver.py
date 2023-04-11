@@ -9,7 +9,8 @@ import struct
 import sqlite3
 
 
-# ioLory receiver(COM5)
+# feather M0 LoRa receiver(COM7)
+# receive data from feather M0 transmitter and save it to db/send it to ulory socket
 # Making serial port
 # port_name : Using port name
 def make_port(port_name):
@@ -29,6 +30,13 @@ def make_port(port_name):
 # Running Port
 serial_port = make_port('COM7')
 
+
+# open socket client
+Host = '127.0.0.1'
+Port = 9999
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client_socket.connect((Host, Port))
+
 '''
 conn = sqlite3.connect("////home/pi/Downloads/marin/src/oceanlab")
 # if no sensordata.db make sensordata.db
@@ -47,9 +55,10 @@ def receive_data(serial_port):
     timestamp = now.strftime('%Y-%m-%d %H:%M:%S')
 
     if serial_port.readable():
-        data = serial_port.readline()[:-4]
+        data = serial_port.readline()[:-4]  #remove '/r/n'
         #save_data(data)
         print("receive data: ", timestamp, " / ", data)
+        client_socket.sendall(data)
     return
 
 
@@ -78,6 +87,5 @@ while True:
         receive_data(serial_port)
         time.sleep(0.1)
 
-
-
+client_socket.close()
 
