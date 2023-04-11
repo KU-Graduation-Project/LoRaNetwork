@@ -28,7 +28,7 @@ def make_port(port_name):
     return ser
 
 # Running Port
-serial_port = make_port('COM7')
+serial_port = make_port('/dev/ttyACM1')
 
 
 # open socket client
@@ -37,7 +37,7 @@ Port = 9999
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client_socket.connect((Host, Port))
 
-'''
+
 conn = sqlite3.connect("////home/pi/Downloads/marin/src/oceanlab")
 # if no sensordata.db make sensordata.db
 global cur
@@ -45,9 +45,7 @@ cur = conn.cursor()
 cur.execute('CREATE TABLE IF NOT EXISTS sensor_data(ID INTEGER PRIMARY KEY AUTOINCREMENT, data text)')
 
 conn.commit()
-'''
-    
-#make_db()
+
 
 
 def receive_data(serial_port):
@@ -56,9 +54,8 @@ def receive_data(serial_port):
 
     if serial_port.readable():
         data = serial_port.readline()[:-4]  #remove '/r/n'
-        #save_data(data)
         print("receive data: ", timestamp, " / ", data)
-        client_socket.sendall(data)
+        save_data(data)
     return
 
 
@@ -66,26 +63,25 @@ def receive_data(serial_port):
 def save_data(bytedata):
     data = bytedata.decode('utf-8')
     
-    if(len(data)>10):
+    if(len(data)>4):
         null_data = None
-        strings = data.split(",", 1)
+        strings = data.split(',', 2)
         did = strings[1]
         
         cur.execute("SELECT uid FROM user WHERE did = '%s'" % did)
-        data = data +" "+ str(cur.fetchall())[3:-4]
+        data = data +","+ str(cur.fetchall())[3:-4]
         cur.execute("SELECT name FROM user WHERE did = '%s'" % did)
-        data = data +" "+ str(cur.fetchall())[3:-4]
+        data = data +","+ str(cur.fetchall())[3:-4]
         
+        client_socket.sendall(data.encode('utf-8'))
         cur.execute("INSERT INTO sensor_data VALUES(?,?)", (null_data, data))
         conn.commit()
 
 
 
 while True:
-    if serial_port.readable():
-        #save_data(data)
-        receive_data(serial_port)
-        time.sleep(0.1)
+    receive_data(serial_port)
+    time.sleep(0.1)
 
 client_socket.close()
 

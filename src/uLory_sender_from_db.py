@@ -37,10 +37,10 @@ while True:
     cur.execute("SELECT COUNT(data) FROM sensor_data")
     st = str(cur.fetchall())[2:-3]
     datasize = int(st)
-    if(datasize==2):
+    if(datasize>=4):
         cur.execute("SELECT data FROM sensor_data")
         data = bytearray(str(cur.fetchall())[2:-1], encoding='utf-8')
-        if serial_port.write(data) : print("long send/",data)
+        if serial_port.write(data) : print("sned: ",data)
         cur.execute("DELETE FROM sensor_data")
         conn.commit()
     time.sleep(0.5)

@@ -15,6 +15,9 @@ ADDR = (Host, Port)
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server_socket.bind(ADDR)  # address binding
 server_socket.listen()  # ready to accept client
+
+
+
 def make_port(port_name):
     ser = serial.Serial(
         port=port_name,
@@ -35,19 +38,19 @@ def send_data(data):
 
 
 # Running Port
-serial_port = make_port('COM4')
+serial_port = make_port('/dev/ttyUSB0')
 
-
-
-
+client_socket, client_addr = server_socket.accept() #accept incoming client
 while True:
-    client_socket, client_addr = server_socket.accept() #accept incoming client
-    data = client_socket.recv(1024)  # 클라이언트가 보낸 메시지 반환
+    data = client_socket.recv(64)  # 클라이언트가 보낸 메시지 반환
+    if not data:
+            # if data is not received
+            continue
     send_data(data)
     now = datetime.now()
     timestamp = now.strftime('%Y-%m-%d %H:%M:%S')
     print(timestamp, " received :", data)
-    time.sleep(0.5)
+    #time.sleep(0.5)
 
 client_socket.close()
 server_socket.close()

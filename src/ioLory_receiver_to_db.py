@@ -27,7 +27,7 @@ def make_port(port_name):
     return ser
 
 # Running Port
-serial_port = make_port('/dev/ttyUSB0')
+serial_port = make_port('/dev/ttyUSB1')
 conn = sqlite3.connect("////home/pi/Downloads/marin/src/oceanlab")
 # if no sensordata.db make sensordata.db
 global cur
