@@ -16,8 +16,6 @@ server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server_socket.bind(ADDR)  # address binding
 server_socket.listen()  # ready to accept client
 
-
-
 def make_port(port_name):
     ser = serial.Serial(
         port=port_name,
@@ -38,7 +36,7 @@ def send_data(data):
 
 
 # Running Port
-serial_port = make_port('/dev/ttyUSB0')
+serial_port = make_port('/dev/ttyUSB1')
 
 client_socket, client_addr = server_socket.accept() #accept incoming client
 while True:

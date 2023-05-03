@@ -1,13 +1,13 @@
 import json
 import threading
 import time
-from datetime import datetime
+from datetime import datetime, time as tm
 import socket
 
 import serial
 import struct
 import sqlite3
-
+import numpy as np
 
 # feather M0 LoRa receiver(COM7)
 # receive data from feather M0 transmitter and save it to db/send it to ulory socket
@@ -28,8 +28,7 @@ def make_port(port_name):
     return ser
 
 # Running Port
-serial_port = make_port('/dev/ttyACM1')
-
+serial_port = make_port('/dev/ttyACM0')
 
 # open socket client
 Host = '127.0.0.1'
@@ -43,10 +42,12 @@ conn = sqlite3.connect("////home/pi/Downloads/marin/src/oceanlab")
 global cur
 cur = conn.cursor()
 cur.execute('CREATE TABLE IF NOT EXISTS sensor_data(ID INTEGER PRIMARY KEY AUTOINCREMENT, data text)')
+cur.execute('CREATE TABLE IF NOT EXISTS time(uid int, timestamp text, tic int)')
 
 conn.commit()
 
-
+arr = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+ticArr = np.array(arr, dtype='bool')
 
 def receive_data(serial_port):
     now = datetime.now()
@@ -58,8 +59,6 @@ def receive_data(serial_port):
         save_data(data)
     return
 
-
-
 def save_data(bytedata):
     data = bytedata.decode('utf-8')
     
@@ -67,11 +66,22 @@ def save_data(bytedata):
         null_data = None
         strings = data.split(',', 2)
         did = strings[1]
+        tic = strings[0]
         
         cur.execute("SELECT uid FROM user WHERE did = '%s'" % did)
-        data = data +","+ str(cur.fetchall())[3:-4]
+        uid = str(cur.fetchall())[3:-4]
+        uidIdx = int(uid)
+        if ticArr[uidIdx]==False:
+            nowTime = datetime.now()
+            nowTimestamp = nowTime.strftime('%Y-%m-%d %H:%M:%S')
+            cur.execute("INSERT INTO time VALUES(?,?,?)", (uid, nowTimestamp, tic))
+            conn.commit()
+            ticArr[uidIdx] = True
+        
+        data = data +","+ uid
         cur.execute("SELECT name FROM user WHERE did = '%s'" % did)
-        data = data +","+ str(cur.fetchall())[3:-4]
+        name = str(cur.fetchall())[3:-4]
+        data = data +","+ name
         
         client_socket.sendall(data.encode('utf-8'))
         cur.execute("INSERT INTO sensor_data VALUES(?,?)", (null_data, data))

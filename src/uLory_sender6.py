@@ -42,13 +42,11 @@ while True:
     # randNumber = 4
     now = datetime.now()
     timestamp = now.strftime('%H:%M:%S')
-    jsondata = bytearray(json.dumps(
-        {"deviceId": deviceId, "timestamp": str(timestamp), "g_x": randNumber, "g_y": randNumber, "g_z": randNumber,
-         "a_x": randNumber, "a_y": randNumber, "a_z": randNumber, "heartrate": randNumber1, "resp": randNumber2,
-         "temp": randNumber3}), encoding='utf-8')
+    data = bytearray(str(deviceId)+" "+str(timestamp)+" "+ str(randNumber)+" "+ str(randNumber)+" "+str(randNumber)
+                                     +" "+str(randNumber)+" "+ str(randNumber)+" "+str(randNumber)+" "+str(randNumber1)+" "+str(randNumber2)+" "+str(randNumber3), encoding='utf-8')
 
-    # jsondata = bytearray(json.dumps({"deviceId": deviceId, "timestamp": str(timestamp), "heartrate": randNumber1, "resp": randNumber2, "temp": randNumber3}), encoding='utf-8')
-    send_data(jsondata)
-    print(timestamp, " / ", jsondata)
+    #ax,ay,az,gx,gy,gz,heartrate,resp,temp
+    send_data(data)
+    print(timestamp, " / ", data)
     time.sleep(2)
 
