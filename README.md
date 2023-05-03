@@ -11,7 +11,7 @@
 ## DataFlow
 
 ---
-![LoRaNetwork_dataflow](./LoRaNetwork_dataflow.png)
+![LoRaNetwork_dataflow1](./LoRaNetwork_dataflow1.png)
 
 
 ### 중계기 단거리 Lory 형태
