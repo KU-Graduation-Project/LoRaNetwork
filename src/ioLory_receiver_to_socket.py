@@ -47,10 +47,46 @@ def receive_data(serial_port):
 
     if serial_port.readable():
         res = serial_port.readline()
+            
         print("receive data: ", timestamp, " / ", res)
         client_socket.sendall(res)
     return
 
+
+
+isConnected = False
+isInfoSet = False
+
+# Raspberry Pie initial connect
+# ioLory DID must be set as featherLoRa receiver
+def conn_ack():
+    if serial_port.readable():
+        res = serial_port.readline()
+        if res == 'conn_req' :
+            ack_msg = 'conn_ack'
+            isConnected = True
+            for i in range(0, 2) :
+                serial_port.write(ack_msg)
+
+#get user info from db
+#send to Raspberry Pie featherLora receiver                
+def send_user_info():
+    if serial_port.readable():
+        res = serial_port.readline()
+        if res == 'info_req' :
+            ack_msg = 'info_ack'
+            # data = user_info
+            isInfoSet = True
+            serial_port.write(ack_msg)
+            for i in range(0, 2) :
+                serial_port.write(data)
+
+
+while True:
+    if isConnected == False:
+        conn_ack()
+    if isInfoSet == False:
+        send_user_info()
 
 while True:
     # ser.write(b'check serial data')

@@ -43,10 +43,12 @@ global cur
 cur = conn.cursor()
 cur.execute('CREATE TABLE IF NOT EXISTS sensor_data(ID INTEGER PRIMARY KEY AUTOINCREMENT, data text)')
 cur.execute('CREATE TABLE IF NOT EXISTS time(uid int, timestamp text, tic int)')
+cur.execute('CREATE TABLE IF NOT EXISTS user(did text primary key, uid text, name text)')
 
 conn.commit()
 
 arr = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+#array to check whether this sensor tic info is new
 ticArr = np.array(arr, dtype='bool')
 
 def receive_data(serial_port):
@@ -90,8 +92,35 @@ def save_data(bytedata):
 
 def conn_req():
     conn_msg = 'conn_req'
-    serial_port.wrtie(conn_msg)
+    serial_port.write(conn_msg)
+    
+def info_req():
+    info_msg = 'info_req'
+    serial_port.write(info_msg)
 
+
+# Monitor system request connect
+while True:
+    conn_req()
+    if serial_port.readable():
+        data = serial_port.readline()
+        if data == "conn_ack":
+            break
+
+# Monitor system request user info
+while True:
+    info_req()
+    if serial_port.readable():
+        data = serial_port.readline()
+        if data == "info_ack":
+            
+            strings = data.split(',', 3)
+            did = strings[0]
+            uid = strings[1]
+            name = strings[2]
+            cursor.execute("INSERT INTO user(did, uid, name) VALUES('"+did+"', '"+uid+"', '"+name+"')")
+            
+            break
 
 
 while True:
