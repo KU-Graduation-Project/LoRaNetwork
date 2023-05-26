@@ -6,6 +6,7 @@ import socket
 
 import serial
 import struct
+impoty mysql.connector
 
 
 # ioLory receiver(COM5)
@@ -36,6 +37,12 @@ client_socket.connect((Host, Port))
 
 # Running Port
 serial_port = make_port('COM5')
+
+conn = mysql.connector.connect(host = 'localhost:3306',
+                                database= 'oceanlab',
+                                user= 'admin',
+                                password= 'password')
+cur = conn.cursor()
 
 # Receiving Data, Thread 1, this function read byte data from serial port and save in datalist
 # ser : serial port
@@ -75,7 +82,8 @@ def send_user_info():
         res = serial_port.readline()
         if res == 'info_req' :
             ack_msg = 'info_ack'
-            # data = user_info
+            cur.execute("SELECT * FROM user")
+            data = str(cur.fetchall())
             isInfoSet = True
             serial_port.write(ack_msg)
             for i in range(0, 2) :
