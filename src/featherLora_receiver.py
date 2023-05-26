@@ -88,6 +88,11 @@ def save_data(bytedata):
         conn.commit()
 
 
+def conn_req():
+    conn_msg = 'conn_req'
+    serial_port.wrtie(conn_msg)
+
+
 
 while True:
     receive_data(serial_port)
