@@ -36,11 +36,48 @@ def send_data(data):
 
 
 # Running Port
-serial_port = make_port('/dev/ttyUSB1')
+serial_port = make_port('/dev/ttyUSB0')
 
+
+def conn_req():
+    conn_msg = 'conn_req'
+    print('conn_req')
+    serial_port.write(conn_msg.encode('utf-8'))
+    time.sleep(0.5)
+    
+def info_req():
+    info_msg = 'info_req'
+    print('info_req')
+    serial_port.write(info_msg.encode('utf-8'))
+    time.sleep(0.5)
+
+
+# Monitor system request connect
+while True:
+    conn_req()
+    if serial_port.readable():
+        data = serial_port.readline()
+        if data == "conn_ack":
+            break
+
+# Monitor system request user info
+while True:
+    info_req()
+    if serial_port.readable():
+        data = serial_port.readline()
+        if data == "info_ack":
+            
+            strings = data.split(',', 3)
+            did = strings[0]
+            uid = strings[1]
+            name = strings[2]
+            cursor.execute("INSERT INTO user(did, uid, name) VALUES('"+did+"', '"+uid+"', '"+name+"')")
+            
+            break
+            
 client_socket, client_addr = server_socket.accept() #accept incoming client
 while True:
-    data = client_socket.recv(64)  # 클라이언트가 보낸 메시지 반환
+    data = client_socket.recv(64)  # 클라이언트가 보낸 메시지  
     if not data:
             # if data is not received
             continue
