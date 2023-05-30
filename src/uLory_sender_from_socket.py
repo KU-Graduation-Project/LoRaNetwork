@@ -16,6 +16,10 @@ server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server_socket.bind(ADDR)  # address binding
 server_socket.listen()  # ready to accept client
 
+conn = sqlite3.connect("////home/pi/Downloads/marin/src/oceanlab")
+global cur
+cur = conn.cursor()
+
 def make_port(port_name):
     ser = serial.Serial(
         port=port_name,
@@ -57,12 +61,14 @@ while True:
         if "conn_ack" in msg:
             break
 
+isInfoSet = False
 def info_req():
     info_msg = "info_req"
     msg = info_msg.encode('utf-8')
     print(msg)
     serial_port.write(msg)
     time.sleep(0.5)
+
 
 # Monitor system request user info
 while True:
@@ -71,14 +77,33 @@ while True:
         data = serial_port.readline()
         print("received:", data)
         msg = data.decode('utf-8')
-        if msg == "info_ack":
-            strings = data.split(',', 3)
-            did = strings[0]
-            uid = strings[1]
-            name = strings[2]
-            cursor.execute("INSERT INTO user(did, uid, name) VALUES('"+did+"', '"+uid+"', '"+name+"')")
+        if "info_ack" in msg:
+            while True:
+                if serial_port.readable():
+                    data = serial_port.readline()
+                    msg = data.decode('utf-8')
+                    if "{{" in msg:
+                        split_info = msg.split('}, {')
+                        split_info[0] = split_info[0][10:]
+                        split_info[-1] = split_info[-1][:-2]
+                        for user in split_info:
+                            print("user_info:", user)
             
-            break
+                            strings = user.split(',', 3)
+                            did = strings[0]
+                            uid = strings[1]
+                            name = strings[2]
+                            cur.execute("INSERT INTO user(did, uid, name) VALUES('"+did+"', '"+uid+"', '"+name+"')")
+                            
+                        isInfoSet = True
+                        info_msg = "info_set"
+                        msg = info_msg.encode('utf-8')
+                        print(msg)
+                        for i in Range(0, 3):
+                            serial_port.write(msg)
+                        break
+    if isInfoSet is True:
+        break
 '''           
 client_socket, client_addr = server_socket.accept() #accept incoming client
 while True:
@@ -91,7 +116,7 @@ while True:
     timestamp = now.strftime('%Y-%m-%d %H:%M:%S')
     print(timestamp, " received :", data)
     #time.sleep(0.5)
-'''
+
 client_socket.close()
 server_socket.close()
-
+'''
