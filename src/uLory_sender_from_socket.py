@@ -40,15 +40,10 @@ serial_port = make_port('/dev/ttyUSB0')
 
 
 def conn_req():
-    conn_msg = 'conn_req'
-    print('conn_req')
-    serial_port.write(conn_msg.encode('utf-8'))
-    time.sleep(0.5)
-    
-def info_req():
-    info_msg = 'info_req'
-    print('info_req')
-    serial_port.write(info_msg.encode('utf-8'))
+    conn_msg = "conn_req"
+    msg = conn_msg.encode('utf-8')
+    print("send:",msg)
+    serial_port.write(msg)
     time.sleep(0.5)
 
 
@@ -57,16 +52,26 @@ while True:
     conn_req()
     if serial_port.readable():
         data = serial_port.readline()
-        if data == "conn_ack":
+        print("received:", data)
+        msg = data.decode('utf-8')
+        if "conn_ack" in msg:
             break
+
+def info_req():
+    info_msg = "info_req"
+    msg = info_msg.encode('utf-8')
+    print(msg)
+    serial_port.write(msg)
+    time.sleep(0.5)
 
 # Monitor system request user info
 while True:
     info_req()
     if serial_port.readable():
         data = serial_port.readline()
-        if data == "info_ack":
-            
+        print("received:", data)
+        msg = data.decode('utf-8')
+        if msg == "info_ack":
             strings = data.split(',', 3)
             did = strings[0]
             uid = strings[1]
@@ -74,7 +79,7 @@ while True:
             cursor.execute("INSERT INTO user(did, uid, name) VALUES('"+did+"', '"+uid+"', '"+name+"')")
             
             break
-            
+'''           
 client_socket, client_addr = server_socket.accept() #accept incoming client
 while True:
     data = client_socket.recv(64)  # 클라이언트가 보낸 메시지  
@@ -86,7 +91,7 @@ while True:
     timestamp = now.strftime('%Y-%m-%d %H:%M:%S')
     print(timestamp, " received :", data)
     #time.sleep(0.5)
-
+'''
 client_socket.close()
 server_socket.close()
 
