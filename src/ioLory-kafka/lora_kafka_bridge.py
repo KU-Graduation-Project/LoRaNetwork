@@ -1,3 +1,7 @@
+from kafka import KafkaProducer
+
+"ioLory에서 데이터 받아 user별로 카프카에 전달"
+
 import json
 import threading
 import time
@@ -49,17 +53,6 @@ cur = conn.cursor()
 # Receiving Data, Thread 1, this function read byte data from serial port and save in datalist
 # ser : serial port
 # datalist : global memory for sharing data with other threads
-
-def receive_data(serial_port):
-    now = datetime.now()
-    timestamp = now.strftime('%Y-%m-%d %H:%M:%S')
-
-    if serial_port.readable():
-        res = serial_port.readline()
-
-        print("receive data: ", timestamp, " / ", res)
-        client_socket.sendall(res)
-    return
 
 
 isConnected = False
@@ -116,12 +109,6 @@ def send_user_info():
                 print("sent:", encoded_user_data)
                 serial_port.write(encoded_user_data)
 
-                '''
-                # user_info = "{{1, 01, one}, {2, 02, two}, {3, 03, three}, {4, 04, four}, {5, 05, five}, {6, 06, six}, {7, 07, seven}, {8, 08, eight}, {9, 09, nine}}"
-                user_info = "info_ack{{1, 01, one}, {2, 02, two}, {3, 03, three}, {4, 04, four}, {5, 05, five}, {6, 06, six}}"
-                encoded_user_info = user_info.encode()
-                serial_port.write(encoded_user_info)
-                '''
                 if serial_port.readable():
                     res = serial_port.readline()
                     data = res.decode()
@@ -134,11 +121,38 @@ while True:
         send_user_info()
     if isInfoSet is True:
         break
+##################################initial connection done
+
+def stream_data():
+    now = datetime.now()
+    timestamp = now.strftime('%Y-%m-%d %H:%M:%S')
+
+    if serial_port.readable():
+        sensor_data = serial_port.readline()
+        decoded_sensor_data = sensor_data.decode("utf-8")
+        strings = decoded_sensor_data.split(",")
+        topic = strings[1]
+        kafka_producer = KafkaProducer(bootstrap_servers='localhost:9092',
+                                       value_serializer=lambda v: json.dumps(v).encode('utf-8'))
+
+        kafka_producer.send(topic, decoded_sensor_data)
+        print('ioLory in KAFKA out - ' + decoded_sensor_data + ' to ' + topic)
+
+
+
+device_list = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+
+'''
+if __name__ == '__main__':
+    # 컨슈머 멀티프로세싱
+    pool = multiprocessing.Pool(processes=10)
+    pool.map(connect, device_list)
+'''
 
 while True:
     print(serial_port.readline())
 
-    receive_data(serial_port)
+    stream_data()
     time.sleep(0.1)
 
 client_socket.close()
