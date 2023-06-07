@@ -88,40 +88,7 @@ def save_data(bytedata):
         client_socket.sendall(data.encode('utf-8'))
         cur.execute("INSERT INTO sensor_data VALUES(?,?)", (null_data, data))
         conn.commit()
-
-
-def conn_req():
-    conn_msg = 'conn_req'
-    serial_port.write(conn_msg)
-    
-def info_req():
-    info_msg = 'info_req'
-    serial_port.write(info_msg)
-
-
-# Monitor system request connect
-while True:
-    conn_req()
-    if serial_port.readable():
-        data = serial_port.readline()
-        if data == "conn_ack":
-            break
-
-# Monitor system request user info
-while True:
-    info_req()
-    if serial_port.readable():
-        data = serial_port.readline()
-        if data == "info_ack":
-            
-            strings = data.split(',', 3)
-            did = strings[0]
-            uid = strings[1]
-            name = strings[2]
-            cursor.execute("INSERT INTO user(did, uid, name) VALUES('"+did+"', '"+uid+"', '"+name+"')")
-            
-            break
-
+        
 
 while True:
     receive_data(serial_port)
