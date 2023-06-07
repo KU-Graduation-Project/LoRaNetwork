@@ -6,12 +6,14 @@ import socket
 
 import serial
 import struct
-impoty mysql.connector
+
+
+# import mysql.connector
 
 
 # ioLory receiver(COM5)
 # Making serial port
-# port_name : Using port name
+# port_name : Using port namepi
 def make_port(port_name):
     ser = serial.Serial(
         port=port_name,
@@ -26,6 +28,8 @@ def make_port(port_name):
 
     return ser
 
+
+'''
 # open socket client
 # send data to web
 Host = '127.0.0.1'
@@ -33,16 +37,19 @@ Port = 9999
 
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client_socket.connect((Host, Port))
-
+'''
 
 # Running Port
 serial_port = make_port('COM5')
 
-conn = mysql.connector.connect(host = 'localhost:3306',
-                                database= 'oceanlab',
-                                user= 'admin',
-                                password= 'password')
+'''
+conn = mysql.connector.connect(host='localhost',
+                               database='oceanlab',
+                               user='admin',
+                               password='12341234')
 cur = conn.cursor()
+'''
+
 
 # Receiving Data, Thread 1, this function read byte data from serial port and save in datalist
 # ser : serial port
@@ -54,54 +61,88 @@ def receive_data(serial_port):
 
     if serial_port.readable():
         res = serial_port.readline()
-            
+
         print("receive data: ", timestamp, " / ", res)
-        client_socket.sendall(res)
+        # client_socket.sendall(res)
     return
 
 
-
 isConnected = False
-isInfoSet = False
 
-# Raspberry Pie initial connect
-# ioLory DID must be set as featherLoRa receiver
+# uLory(Raspberry Pi)-ioLory(Monitor system) initial connect
+# ioLory DID must be set as uLory sender
 def conn_ack():
+    global isConnected
     if serial_port.readable():
         res = serial_port.readline()
-        if res == 'conn_req' :
+        data = res.decode()
+
+        if data == 'conn_req':
+            print("received:", data)
             ack_msg = 'conn_ack'
+            msg = ack_msg.encode('utf-8')
+            while data !='info_req':
+                print("sent:", msg)
+                time.sleep(0.6)
+                serial_port.write(msg)
+                if serial_port.readable():
+                    res = serial_port.readline()
+                    data = res.decode()
             isConnected = True
-            for i in range(0, 2) :
-                serial_port.write(ack_msg)
 
-#get user info from db
-#send to Raspberry Pie featherLora receiver                
+
+while True:
+    if isConnected is False:
+        conn_ack()
+    if isConnected is True:
+        print("conn_ack break")
+        break
+
+isInfoSet = False
+# get user info from db
+# send back to uLory sender
 def send_user_info():
+    global isInfoSet
     if serial_port.readable():
         res = serial_port.readline()
-        if res == 'info_req' :
-            ack_msg = 'info_ack'
-            cur.execute("SELECT * FROM user")
-            data = str(cur.fetchall())
+        data = res.decode('utf-8')
+        if data == 'info_req':
+            print("received:", data)
+            while data !='info_set':
+                '''
+                cur.execute("SELECT * FROM user")
+                data = str(cur.fetchall())
+
+                for i in range(0, data.size()):
+                    serial_port.write(data)
+                '''
+                # user_info = "{{1, 01, one}, {2, 02, two}, {3, 03, three}, {4, 04, four}, {5, 05, five}, {6, 06, six}, {7, 07, seven}, {8, 08, eight}, {9, 09, nine}}"
+                user_info = "info_ack{{1, 01, one}, {2, 02, two}, {3, 03, three}, {4, 04, four}, {5, 05, five}, {6, 06, six}}"
+                encoded_user_info = user_info.encode()
+                serial_port.write(encoded_user_info)
+                print("sent:", encoded_user_info)
+                if serial_port.readable():
+                    res = serial_port.readline()
+                    data = res.decode()
+                    print('received:', data)
+                time.sleep(1)
+            for i in range(0, 20):
+                msg = "info_set_complete"
+                encoded_msg = msg.encode()
+                serial_port.write(encoded_msg)
             isInfoSet = True
-            serial_port.write(ack_msg)
-            for i in range(0, 2) :
-                serial_port.write(data)
-
 
 while True:
-    if isConnected == False:
-        conn_ack()
-    if isInfoSet == False:
+    if isInfoSet is False:
         send_user_info()
+    if isInfoSet is True:
+        break
 
-while True:
-    # ser.write(b'check serial data')
-    # print(serial_port.readline())
+# while True:
+# ser.write(b'check serial data')
+# print(serial_port.readline())
 
-    receive_data(serial_port)
-    time.sleep(0.1)
+# receive_data(serial_port)
+# time.sleep(0.1)
 
-
-client_socket.close()
+# client_socket.close()
