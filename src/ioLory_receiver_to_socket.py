@@ -61,39 +61,6 @@ def receive_data(serial_port):
         #client_socket.sendall(res)
     return
 
-'''
-isConnected = False
-
-
-# uLory(Raspberry Pi)-ioLory(Monitor system) initial connect
-# ioLory DID must be set as uLory sender
-def conn_ack():
-    global isConnected
-    if serial_port.readable():
-        res = serial_port.readline()
-        data = res.decode()
-
-        if data == 'conn_req':
-            print("received:", data)
-            ack_msg = 'conn_ack'
-            msg = ack_msg.encode('utf-8')
-            while data != 'info_req':
-                print("sent:", msg)
-                time.sleep(0.6)
-                serial_port.write(msg)
-                if serial_port.readable():
-                    res = serial_port.readline()
-                    data = res.decode()
-            isConnected = True
-
-
-while True:
-    if isConnected is False:
-        conn_ack()
-    if isConnected is True:
-        print("conn_ack break")
-        break
-'''
 
 isInfoSet = False
 
