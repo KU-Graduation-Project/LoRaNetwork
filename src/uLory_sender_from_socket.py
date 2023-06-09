@@ -39,26 +39,6 @@ def make_port(port_name):
 # Running Port
 serial_port = make_port('/dev/ttyUSB0')
 
-'''
-def conn_req():
-    conn_msg = "conn_req"
-    msg = conn_msg.encode('utf-8')
-    print("send:",msg)
-    serial_port.write(msg)
-    time.sleep(0.5)
-
-
-# Monitor system request connect
-while True:
-    conn_req()
-    if serial_port.readable():
-        data = serial_port.readline()
-        print("received:", data)
-        msg = data.decode('utf-8')
-        if "conn_ack" in msg:
-            break
-'''
-
 isInfoSet = False
 def info_req():
     info_msg = "info_req"
