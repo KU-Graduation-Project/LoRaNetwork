@@ -42,9 +42,11 @@ conn = sqlite3.connect("////home/pi/Downloads/marin/src/oceanlab")
 global cur
 cur = conn.cursor()
 cur.execute('CREATE TABLE IF NOT EXISTS sensor_data(ID INTEGER PRIMARY KEY AUTOINCREMENT, data text)')
+cur.execute('DELETE FROM sensor_data')
 cur.execute('CREATE TABLE IF NOT EXISTS time(uid int, timestamp text, tic int)')
+cur.execute('DELETE FROM time')
 cur.execute('CREATE TABLE IF NOT EXISTS user(did text primary key, uid text, name text)')
-
+cur.execute('DELETE FROM user')
 conn.commit()
 
 arr = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
@@ -71,14 +73,17 @@ def save_data(bytedata):
         tic = strings[0]
         
         cur.execute("SELECT uid FROM user WHERE did = '%s'" % did)
-        uid = str(cur.fetchall())[3:-4]
-        uidIdx = int(uid)
-        if ticArr[uidIdx]==False:
-            nowTime = datetime.now()
-            nowTimestamp = nowTime.strftime('%Y-%m-%d %H:%M:%S')
-            cur.execute("INSERT INTO time VALUES(?,?,?)", (uid, nowTimestamp, tic))
-            conn.commit()
-            ticArr[uidIdx] = True
+        uid = ""
+        result = cur.fetchone()
+        if result is not None :
+            uid = str(result)[2:-3]
+            uidIdx = int(uid)
+            if ticArr[uidIdx] is False:
+                nowTime = datetime.now()
+                nowTimestamp = nowTime.strftime('%Y-%m-%d %H:%M:%S')
+                cur.execute("INSERT INTO time VALUES(?,?,?)", (uid, nowTimestamp, tic))
+                conn.commit()
+                ticArr[uidIdx] = True
         
         data = data +","+ uid
         cur.execute("SELECT name FROM user WHERE did = '%s'" % did)

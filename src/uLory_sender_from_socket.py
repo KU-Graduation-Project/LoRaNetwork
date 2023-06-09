@@ -35,14 +35,11 @@ def make_port(port_name):
 
     return ser
 
-def send_data(data):
-    serial_port.write(data)
-
 
 # Running Port
 serial_port = make_port('/dev/ttyUSB0')
 
-
+'''
 def conn_req():
     conn_msg = "conn_req"
     msg = conn_msg.encode('utf-8')
@@ -60,6 +57,7 @@ while True:
         msg = data.decode('utf-8')
         if "conn_ack" in msg:
             break
+'''
 
 isInfoSet = False
 def info_req():
@@ -73,6 +71,8 @@ def info_req():
 while True:
     info_req()
     if serial_port.readable():
+        if isInfoSet is True:
+            break
         data = serial_port.readline()
         msg = data.decode('utf-8')
         print("received:", msg)
@@ -80,31 +80,19 @@ while True:
         if "info_ack" in msg:
             if "[(" in msg:
                 split_info = msg.split('), (')
-                split_info[0] = split_info[0][2:]
+                split_info[0] = split_info[0][10:]
                 split_info[-1] = split_info[-1][:-2]
                 for user in split_info:
                     print("user_info:", user)
                     strings = user.split(',', 3)
-                    did = strings[0][2:-1]
+                    did = strings[0][1:-1]
                     uid = strings[1][2:-1]
                     name = strings[2][2:-1]
-                    print("did:", did, ", uid:", uid, ", name:", name)
+                    print("did:", did, " uid:", uid, " name:", name)
                     cur.execute("INSERT INTO user(did, uid, name) VALUES('"+did+"', '"+uid+"', '"+name+"')")
                     conn.commit()
                 isInfoSet = True
-                while msg != 'info_set_complete':
-                    info_res = "info_set"
-                    res = info_res.encode('utf-8')
-                    serial_port.write(res)
-                    print(res)
-                    time.sleep(0.6)
-                    
-                    data = serial_port.readline()
-                    print("received:", data)
-                    msg = data.decode('utf-8')
-                break
-    if isInfoSet is True:
-        break
+
           
 client_socket, client_addr = server_socket.accept() #accept incoming client
 while True:
@@ -112,10 +100,10 @@ while True:
     if not data:
             # if data is not received
             continue
-    send_data(data)
+    serial_port.write(data)
     now = datetime.now()
     timestamp = now.strftime('%Y-%m-%d %H:%M:%S')
-    print(timestamp, " received :", data)
+    print(timestamp, " send :", data)
     #time.sleep(0.5)
 
 client_socket.close()
