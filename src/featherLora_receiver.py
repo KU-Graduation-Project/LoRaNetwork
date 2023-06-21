@@ -49,7 +49,7 @@ cur.execute('CREATE TABLE IF NOT EXISTS user(did text primary key, uid text, nam
 cur.execute('DELETE FROM user')
 conn.commit()
 
-arr = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+arr = np.array([False, False, False, False, False, False, False, False, False, False])
 #array to check whether this sensor tic info is new
 ticArr = np.array(arr, dtype='bool')
 
