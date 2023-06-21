@@ -29,8 +29,7 @@ def make_port(port_name):
 #ioLory포트
 serial_port = make_port('COM4')
 
-# open socket client
-# send data to web
+# 리액트 소켓주소
 Host = '127.0.0.1'
 Port = 8080
 
@@ -105,8 +104,6 @@ def stream_data(data):
                                    value_serializer=lambda v: json.dumps(v).encode('utf-8'))
     kafka_producer.send(topic, decoded_sensor_data)
     print('ioLory in KAFKA out - ' + decoded_sensor_data + ' to ' + topic)
-
-
 
 
 while True:
