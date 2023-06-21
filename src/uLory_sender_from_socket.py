@@ -46,10 +46,14 @@ def info_req():
     print(msg)
     serial_port.write(msg)
 
-
 # Monitor system request user info
-while True:
+for i in range(5):
     info_req()
+    time.sleep(0.4)
+
+# Monitor system receive user info
+while True:
+    #info_req()
     if serial_port.readable():
         if isInfoSet is True:
             break
@@ -84,7 +88,6 @@ while True:
     now = datetime.now()
     timestamp = now.strftime('%Y-%m-%d %H:%M:%S')
     print(timestamp, " send :", data)
-    #time.sleep(0.5)
 
 client_socket.close()
 server_socket.close()
