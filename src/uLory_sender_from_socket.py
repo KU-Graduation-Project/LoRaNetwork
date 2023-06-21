@@ -6,9 +6,8 @@ import struct
 import sqlite3
 import time
 
-# uLory sender(COM4/COM6)
-# byte_size : data size
-
+# uLory sender
+# 소켓 서버 열어주기
 Host = '127.0.0.1'
 Port = 9999
 ADDR = (Host, Port)
@@ -16,6 +15,7 @@ server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server_socket.bind(ADDR)  # address binding
 server_socket.listen()  # ready to accept client
 
+#sqlite DB연결
 conn = sqlite3.connect("////home/pi/Downloads/marin/src/oceanlab")
 global cur
 cur = conn.cursor()
@@ -35,8 +35,7 @@ def make_port(port_name):
 
     return ser
 
-
-# Running Port
+#연결 포트
 serial_port = make_port('/dev/ttyUSB0')
 
 isInfoSet = False
@@ -51,7 +50,7 @@ for i in range(5):
     info_req()
     time.sleep(0.4)
 
-# Monitor system receive user info
+# 함선(리액트에서 등록된)에서 유저정보 받기
 while True:
     #info_req()
     if serial_port.readable():
@@ -60,7 +59,7 @@ while True:
         data = serial_port.readline()
         msg = data.decode('utf-8')
         print("received:", msg)
-        #info_ack[('did', 'uid', 'name'), ('did', 'uid', 'name')]
+        #유저정보 수신 형식: info_ack[('did', 'uid', 'name'), ('did', 'uid', 'name')]
         if "info_ack" in msg:
             if "[(" in msg:
                 split_info = msg.split('), (')
@@ -77,8 +76,8 @@ while True:
                     conn.commit()
                 isInfoSet = True
 
-          
-client_socket, client_addr = server_socket.accept() #accept incoming client
+
+client_socket, client_addr = server_socket.accept()
 while True:
     data = client_socket.recv(64)  # 클라이언트가 보낸 메시지  
     if not data:

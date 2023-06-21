@@ -9,10 +9,8 @@ import struct
 import sqlite3
 import numpy as np
 
-# feather M0 LoRa receiver(COM7)
-# receive data from feather M0 transmitter and save it to db/send it to ulory socket
-# Making serial port
-# port_name : Using port name
+# feather M0 LoRa receiver
+# feather M0 transmitter로부터 데이터 받아 db에 저장/uLory에 소켓전송
 def make_port(port_name):
     ser = serial.Serial(
         port=port_name,
@@ -30,13 +28,13 @@ def make_port(port_name):
 # Running Port
 serial_port = make_port('/dev/ttyACM0')
 
-# open socket client
+#소켓 클라이언트
 Host = '127.0.0.1'
 Port = 9999
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client_socket.connect((Host, Port))
 
-
+#sqlite DB 연결
 conn = sqlite3.connect("////home/pi/Downloads/marin/src/oceanlab")
 # if no sensordata.db make sensordata.db
 global cur
@@ -49,8 +47,8 @@ cur.execute('CREATE TABLE IF NOT EXISTS user(did text primary key, uid text, nam
 cur.execute('DELETE FROM user')
 conn.commit()
 
-arr = np.array([False, False, False, False, False, False, False, False, False, False])
-#array to check whether this sensor tic info is new
+arr = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+#기기별 틱 정보가 저장됐는지 확인하기 위한 배열
 ticArr = np.array(arr, dtype='bool')
 
 def receive_data(serial_port):
@@ -78,13 +76,15 @@ def save_data(bytedata):
         if result is not None :
             uid = str(result)[2:-3]
             uidIdx = int(uid)
+            #연결 후 첫 틱 저장
             if ticArr[uidIdx] is False:
                 nowTime = datetime.now()
                 nowTimestamp = nowTime.strftime('%Y-%m-%d %H:%M:%S')
                 cur.execute("INSERT INTO time VALUES(?,?,?)", (uid, nowTimestamp, tic))
                 conn.commit()
                 ticArr[uidIdx] = True
-        
+
+        #DB에서 유저 이름 찾아서 데이터 마지막에 추가
         data = data +","+ uid
         cur.execute("SELECT name FROM user WHERE did = '%s'" % did)
         name = str(cur.fetchall())[3:-4]

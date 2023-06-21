@@ -11,9 +11,8 @@ import mysql.connector
 from kafka import KafkaProducer
 
 
-# ioLory receiver(COM5)
-# Making serial port
-# port_name : Using port namepi
+# ioLory receiver
+# 시리얼포트 연결 설정
 def make_port(port_name):
     ser = serial.Serial(
         port=port_name,
@@ -27,9 +26,7 @@ def make_port(port_name):
     print('receiver open')
 
     return ser
-
-
-# Running Port
+#ioLory포트
 serial_port = make_port('COM4')
 
 # open socket client
@@ -37,9 +34,11 @@ serial_port = make_port('COM4')
 Host = '127.0.0.1'
 Port = 8080
 
+#리액트와 소켓연결
 client_socket = websocket.WebSocket()
 client_socket.connect('ws://localhost:8080')
 
+#mysql 연결
 conn = mysql.connector.connect(host='localhost',
                                database='oceanlab',
                                user='root',
@@ -47,12 +46,11 @@ conn = mysql.connector.connect(host='localhost',
 cur = conn.cursor()
 
 
+#유저정보 설정확인
 isInfoSet = False
-
-
-# get user info from db
-# send back to uLory sender
-# user_info : "info_ack[('1', '01', 'one'), ('2', '02', 'two'), ('5', '05', 'five'), ('6', '06', 'six')]"
+# mysql로부터 유저정보 받아와 info_ack 붙임
+# 라즈베리파이(중계기)의 uLory에게 송신
+# user_info형식 : "info_ack[('1', '01', 'one'), ('2', '02', 'two'), ('5', '05', 'five'), ('6', '06', 'six')]"
 def send_user_info():
     global isInfoSet
     if serial_port.readable():
@@ -83,10 +81,6 @@ def send_user_info():
                 res = serial_port.readline()
                 data = res.decode()
                 print('received:', data)
-
-# Receiving Data, Thread 1, this function read byte data from serial port and save in datalist
-# ser : serial port
-# datalist : global memory for sharing data with other threads
 
 def receive_data(serial_port):
     now = datetime.now()
