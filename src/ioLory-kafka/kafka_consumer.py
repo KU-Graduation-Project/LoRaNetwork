@@ -5,6 +5,7 @@ from asyncio.log import logger
 #import pymysql
 from kafka import KafkaConsumer
 import socket
+import mysql.connector
 
 """토픽에서 데이터 받아 리액트로 소켓 전송"""
 
@@ -17,11 +18,22 @@ Port = 8080
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client_socket.connect((Host, Port))
 
+conn = mysql.connector.connect(host='localhost',
+                               database='oceanlab',
+                               user='root',
+                               password='12341234')
+cur = conn.cursor()
+
 
 class MessageConsumer:
     topic =""
 
     def __init__(self, topic):
+        self.conn = mysql.connector.connect(host='localhost',
+                                       database='oceanlab',
+                                       user='root',
+                                       password='12341234')
+        self.cur = conn.cursor()
         self.topic = topic
 
         self.activate_listener()
@@ -44,14 +56,14 @@ class MessageConsumer:
                 m_in = m_decode[:len(m_decode)]
                 client_socket.sendall(m_in)
 
-                # m_json = json.loads(m_in)
-                # timestamp = m_json["timestamp"]
-                # g_x = str(m_json["data"])
-                # sql = 'INSERT INTO ' + self.topic + ' (timestamp, g_x) VALUES (\''+timestamp+'\', '+g_x+');'
-                # if self.cur.execute(sql):
-                #     print(self.topic + " DB save : " + str(m_json))
-                # # committing message manually after reading from the topic
-                # self.conn.commit()
+                m_json = json.loads(m_in)
+                timestamp = m_json["timestamp"]
+                g_x = str(m_json["data"])
+                sql = 'INSERT INTO ' + self.topic + ' (timestamp, g_x) VALUES (\''+timestamp+'\', '+g_x+');'
+                if self.cur.execute(sql):
+                    print(self.topic + " DB save : " + str(m_json))
+                # committing message manually after reading from the topic
+                self.conn.commit()
 
                 consumer.commit()
 

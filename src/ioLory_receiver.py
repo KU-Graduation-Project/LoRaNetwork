@@ -8,6 +8,7 @@ import serial
 import struct
 
 import mysql.connector
+from kafka import KafkaProducer
 
 
 # ioLory receiver(COM5)
@@ -46,31 +47,20 @@ conn = mysql.connector.connect(host='localhost',
 cur = conn.cursor()
 
 
-# Receiving Data, Thread 1, this function read byte data from serial port and save in datalist
-# ser : serial port
-# datalist : global memory for sharing data with other threads
-
-def receive_data(serial_port):
-    now = datetime.now()
-    timestamp = now.strftime('%Y-%m-%d %H:%M:%S')
-
-    if serial_port.readable():
-        res = serial_port.readline()
-        print("receive data: ", timestamp, " / ", res)
-        client_socket.send(res)
-    return
-
-
 isInfoSet = False
 
 
 # get user info from db
 # send back to uLory sender
+# user_info : "info_ack[('1', '01', 'one'), ('2', '02', 'two'), ('5', '05', 'five'), ('6', '06', 'six')]"
 def send_user_info():
     global isInfoSet
     if serial_port.readable():
         res = serial_port.readline()
         data = res.decode('utf-8')
+
+        #센서 데이터가 들어오면 유저정보 송신 끝
+        #센서 데이터 행위값이 음수
         if "-" in data:
             print("userinfo break:", data)
             isInfoSet = True
@@ -94,6 +84,36 @@ def send_user_info():
                 data = res.decode()
                 print('received:', data)
 
+# Receiving Data, Thread 1, this function read byte data from serial port and save in datalist
+# ser : serial port
+# datalist : global memory for sharing data with other threads
+
+def receive_data(serial_port):
+    now = datetime.now()
+    timestamp = now.strftime('%Y-%m-%d %H:%M:%S')
+
+    if serial_port.readable():
+        res = serial_port.readline()
+        print("receive data: ", timestamp, " / ", res)
+        stream_data(res)
+        client_socket.send(res)
+    return
+
+def stream_data(data):
+    now = datetime.now()
+    timestamp = now.strftime('%Y-%m-%d %H:%M:%S')
+
+    sensor_data = data
+    decoded_sensor_data = sensor_data.decode("utf-8")
+    strings = decoded_sensor_data.split(",")
+    topic = strings[1]
+    kafka_producer = KafkaProducer(bootstrap_servers='localhost:9092',
+                                   value_serializer=lambda v: json.dumps(v).encode('utf-8'))
+    kafka_producer.send(topic, decoded_sensor_data)
+    print('ioLory in KAFKA out - ' + decoded_sensor_data + ' to ' + topic)
+
+
+
 
 while True:
     if isInfoSet is False:
@@ -101,9 +121,9 @@ while True:
     if isInfoSet is True:
         break
 
+
 while True:
     print(serial_port.readline())
-
     receive_data(serial_port)
     time.sleep(0.1)
 
