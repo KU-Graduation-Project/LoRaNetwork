@@ -67,8 +67,10 @@ def send_user_info():
             cur.execute("SELECT * FROM user")
             user_info = "info_ack" + str(cur.fetchall())
             encoded_user_info = user_info.encode('utf-8')
-            print("sent:", encoded_user_info)
-            serial_port.write(encoded_user_info)
+            for i in range(4):
+                print("sent:", encoded_user_info)
+                serial_port.write(encoded_user_info)
+                time.sleep(1.5)
 
             '''
             user_info = "info_ack[('1', '01', 'one'), ('2', '02', 'two'), ('5', '05', 'five'), ('6', '06', 'six')]"
@@ -78,7 +80,7 @@ def send_user_info():
             '''
             if serial_port.readable():
                 res = serial_port.readline()
-                data = res.decode()
+                data = res.decode('utf-8')
                 print('received:', data)
 
 def receive_data(serial_port):
@@ -102,14 +104,16 @@ def stream_data(data):
     sensor_data = data
     decoded_sensor_data = sensor_data.decode("utf-8")
     strings = decoded_sensor_data.split(",")
-    topic = strings[1]  #토픽은 did, kafka에 토픽 생성되어있어야 함
-    kafka_producer = KafkaProducer(bootstrap_servers='localhost:9092',
-                                   value_serializer=lambda v: json.dumps(v).encode('utf-8'))
+    topic = ''
+    if len(strings)>2:
+        topic = strings[1]  #토픽은 did, kafka에 토픽 생성되어있어야 함
+        kafka_producer = KafkaProducer(bootstrap_servers='localhost:9092',
+                                    value_serializer=lambda v: json.dumps(v).encode('utf-8'))
 
-    #client = KafkaClient(bootstrap_servers='localhost:9092')
-    #client.ensure_topic_exists(topic)
-    kafka_producer.send(topic, decoded_sensor_data)
-    print('ioLory in KAFKA out - ' + decoded_sensor_data + ' to ' + topic)
+        #client = KafkaClient(bootstrap_servers='localhost:9092')
+        #client.ensure_topic_exists(topic)
+        kafka_producer.send(topic, decoded_sensor_data)
+        print('ioLory in KAFKA out - ' + decoded_sensor_data + ' to ' + topic)
 
 
 while True:

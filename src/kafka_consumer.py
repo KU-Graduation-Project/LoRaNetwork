@@ -1,29 +1,29 @@
+from datetime import datetime
 import json
 import multiprocessing
 from asyncio.log import logger
 
-#import pymysql
+import pymysql
 from kafka import KafkaConsumer
-#import mysql.connector
+import mysql.connector
 
 
-'''
+
 conn = mysql.connector.connect(host='localhost',
                                database='oceanlab',
                                user='root',
                                password='12341234')
 cur = conn.cursor()
-'''
+
 
 class MessageConsumer:
-    topic =""
 
     def __init__(self, topic):
-        # self.conn = mysql.connector.connect(host='localhost',
-        #                                database='oceanlab',
-        #                                user='root',
-        #                                password='12341234')
-        # self.cur = conn.cursor()
+        self.conn = mysql.connector.connect(host='localhost',
+                                       database='oceanlab',
+                                       user='root',
+                                       password='12341234')
+        self.cur = conn.cursor()
         self.topic = topic
 
         self.activate_listener()
@@ -45,13 +45,16 @@ class MessageConsumer:
                 data = str(message.value.decode("utf-8", "ignore"))
 
                 print(self.topic,': ', data)
-                # cur.execute('CREATE TABLE IF NOT EXISTS '+self.topic+'(time text, data text)')
-                # self.conn.commit()
-                # sql = 'INSERT INTO ' + self.topic + ' (timestamp, g_x) VALUES (\''+timestamp+'\', '+g_x+');'
-                # if self.cur.execute(sql):
-                #     print(self.topic + " DB save : " + str(m_json))
-                # # committing message manually after reading from the topic
-                # self.conn.commit()
+                cur.execute('CREATE TABLE IF NOT EXISTS device'+self.topic+'(time text, data text);')
+                self.conn.commit()
+                now = datetime.now()
+                timestamp = now.strftime('%Y-%m-%d %H:%M:%S')
+
+                sql = 'INSERT INTO device' + self.topic + ' (time, data) VALUES (\''+timestamp+'\', '+data+');'
+                if self.cur.execute(sql):
+                    print(self.topic + " DB save : " + str(data))
+                # committing message manually after reading from the topic
+                self.conn.commit()
 
                 consumer.commit()
 
@@ -68,4 +71,3 @@ if __name__ == '__main__':
 
     pool = multiprocessing.Pool(processes=10)
     pool.map(MessageConsumer, device_list)
-
