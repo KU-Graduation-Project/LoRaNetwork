@@ -59,6 +59,8 @@ class MessageConsumer:
                 m_json = json.loads(m_in)
                 timestamp = m_json["timestamp"]
                 g_x = str(m_json["data"])
+                cur.execute('CREATE TABLE IF NOT EXISTS '+self.topic+'(time text, data text)')
+                self.conn.commit()
                 sql = 'INSERT INTO ' + self.topic + ' (timestamp, g_x) VALUES (\''+timestamp+'\', '+g_x+');'
                 if self.cur.execute(sql):
                     print(self.topic + " DB save : " + str(m_json))

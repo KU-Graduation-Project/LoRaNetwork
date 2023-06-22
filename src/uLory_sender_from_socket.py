@@ -45,7 +45,7 @@ def info_req():
     print(msg)
     serial_port.write(msg)
 
-# Monitor system request user info
+# 함선(리액트)에 유저정보 요청 보내기
 for i in range(5):
     info_req()
     time.sleep(0.4)
@@ -62,6 +62,7 @@ while True:
         #유저정보 수신 형식: info_ack[('did', 'uid', 'name'), ('did', 'uid', 'name')]
         if "info_ack" in msg:
             if "[(" in msg:
+                #수신한 유저정보를 항목별로 나눠서 저장
                 split_info = msg.split('), (')
                 split_info[0] = split_info[0][10:]
                 split_info[-1] = split_info[-1][:-2]

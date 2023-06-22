@@ -92,6 +92,9 @@ def receive_data(serial_port):
         client_socket.send(res)
     return
 
+#카프카에 유저별(토픽별)로 데이터 publish
+#data형식 : tic, did, 배터리, 심박, 체온, 호흡수, ?, 행위, uid, 이름
+#           0   1     2     3   4     5   6   7    8    9
 def stream_data(data):
     now = datetime.now()
     timestamp = now.strftime('%Y-%m-%d %H:%M:%S')
@@ -99,7 +102,7 @@ def stream_data(data):
     sensor_data = data
     decoded_sensor_data = sensor_data.decode("utf-8")
     strings = decoded_sensor_data.split(",")
-    topic = strings[1]
+    topic = strings[1]  #토픽은 did, kafka에 토픽 생성되어있어야 함
     kafka_producer = KafkaProducer(bootstrap_servers='localhost:9092',
                                    value_serializer=lambda v: json.dumps(v).encode('utf-8'))
     kafka_producer.send(topic, decoded_sensor_data)
