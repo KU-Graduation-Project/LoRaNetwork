@@ -105,6 +105,9 @@ def stream_data(data):
     topic = strings[1]  #토픽은 did, kafka에 토픽 생성되어있어야 함
     kafka_producer = KafkaProducer(bootstrap_servers='localhost:9092',
                                    value_serializer=lambda v: json.dumps(v).encode('utf-8'))
+
+    #client = KafkaClient(bootstrap_servers='localhost:9092')
+    #client.ensure_topic_exists(topic)
     kafka_producer.send(topic, decoded_sensor_data)
     print('ioLory in KAFKA out - ' + decoded_sensor_data + ' to ' + topic)
 
